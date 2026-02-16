@@ -1,0 +1,16 @@
+Create a portfolio website for an artist painter.
+
+Categories and functionality:
+1. A landing page with a large image
+2. On the top right, three main categories: About, Work (further divided ()hover-over dropdown) into two subcategories: drawings, paintings), Blog
+3. The work category should show thumbnails of pictures that can be expanded by clicking on them. The thumbnails are shown in a continous band so that horizontals and verticals always align. When clicked on a large version of the picture is shown with sub-information: Title, Year, Material shown on the bottom left. Clicking the right part of the picture goes to the next picture and the left part to the previous picture.
+4. Make the design mobile friendly
+
+
+Layout:
+- minimalistic (white background)
+- modern design
+
+
+
+https://v0.app/chat/artist-portfolio-website-jqkCItUx01q
