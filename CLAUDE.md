@@ -1,5 +1,11 @@
 # CLAUDE.md - Project Guidelines for Claude Code
 
+## Setup (first-run after cloning)
+```bash
+./dev_setup.sh
+```
+This installs dependencies and registers the pre-commit hook that runs `pnpm test` before every commit.
+
 ## Project Overview
 Artist portfolio website for Elena Vasquez built with Next.js 16, React 19, TypeScript, Tailwind CSS, and shadcn/ui.
 
