@@ -24,7 +24,10 @@ Artist portfolio website for Elena Vasquez built with Next.js 16, React 19, Type
 1. **Every new feature** must include corresponding tests before the change is considered complete
 2. **Every bug fix** must include a regression test that fails without the fix
 3. **Every modified file** requires updating its existing tests if behavior changed
-4. **Run `pnpm test` before considering any change complete**
+4. **Run `pnpm test` after creating a commit** — Claude Code will automatically run tests to verify the commit
+
+### Automatic Test Running
+Claude Code is configured to run `pnpm test` after each commit you create. If tests fail, the commit will still exist but you should fix the failing tests immediately and create a follow-up commit.
 
 ### Test Framework
 - **Vitest** with jsdom environment and React Testing Library
