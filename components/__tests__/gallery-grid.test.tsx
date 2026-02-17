@@ -3,6 +3,11 @@ import userEvent from '@testing-library/user-event'
 import { computeRows, GAP, GalleryGrid } from '@/components/gallery-grid'
 import { createMockArtwork, createMockArtworks, resetMockId } from '@/__tests__/helpers/mock-artwork'
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/',
+  useRouter: () => ({ push: vi.fn() }),
+}))
+
 beforeEach(() => {
   resetMockId()
 })
@@ -94,12 +99,6 @@ describe('computeRows', () => {
 })
 
 describe('GalleryGrid component', () => {
-  // Mock next/navigation for the Navigation component used inside pages
-  vi.mock('next/navigation', () => ({
-    usePathname: () => '/',
-    useRouter: () => ({ push: vi.fn() }),
-  }))
-
   it('renders correct number of artwork buttons', () => {
     const artworks = createMockArtworks(3)
     render(<GalleryGrid artworks={artworks} />)
