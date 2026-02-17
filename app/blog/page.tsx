@@ -1,57 +1,15 @@
 import Link from "next/link"
 import { Navigation } from "@/components/navigation"
-
-interface BlogPost {
-  slug: string
-  title: string
-  date: string
-  excerpt: string
-}
-
-const posts: BlogPost[] = [
-  {
-    slug: "studio-reflections-winter",
-    title: "Studio Reflections: Winter Light",
-    date: "January 15, 2025",
-    excerpt:
-      "The winter months bring a particular quality of light to the studio that transforms how I see color. The low sun casts long shadows across the canvases, revealing textures I hadn't noticed before.",
-  },
-  {
-    slug: "new-series-tidal-memory",
-    title: "New Series: Tidal Memory",
-    date: "November 3, 2024",
-    excerpt:
-      "I've been spending time along the coast this autumn, collecting visual impressions of the sea at different hours. This new body of work began as quick studies but evolved into something larger.",
-  },
-  {
-    slug: "exhibition-at-galeria-nova",
-    title: "Exhibition at Galeria Nova, Barcelona",
-    date: "September 12, 2024",
-    excerpt:
-      "Thrilled to announce my upcoming solo exhibition at Galeria Nova in the Gothic Quarter. The show will feature twelve new paintings alongside a selection of preparatory drawings.",
-  },
-  {
-    slug: "on-drawing-as-thinking",
-    title: "On Drawing as Thinking",
-    date: "June 28, 2024",
-    excerpt:
-      "Drawing has always been where my ideas take shape. Not as a preliminary step, but as a form of thinking itself. The direct contact between hand, material, and paper creates a different kind of knowledge.",
-  },
-  {
-    slug: "paris-residency-reflections",
-    title: "Paris Residency: Looking Back",
-    date: "March 5, 2024",
-    excerpt:
-      "It's been a year since I returned from the Cite Internationale des Arts. The experience reshaped my approach to scale and color in ways I'm still discovering.",
-  },
-]
+import { getBlogPosts } from "@/lib/notion"
 
 export const metadata = {
   title: "Blog | Elena Vasquez",
   description: "Writings and updates from the studio of Elena Vasquez.",
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await getBlogPosts()
+
   return (
     <>
       <Navigation />

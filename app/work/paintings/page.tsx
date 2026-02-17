@@ -1,13 +1,15 @@
 import { Navigation } from "@/components/navigation"
 import { GalleryGrid } from "@/components/gallery-grid"
-import { paintings } from "@/lib/artwork-data"
+import { getArtworksByCategory } from "@/lib/notion"
 
 export const metadata = {
   title: "Paintings | Elena Vasquez",
   description: "Painting works by Elena Vasquez. Oil, acrylic, and mixed media on canvas.",
 }
 
-export default function PaintingsPage() {
+export default async function PaintingsPage() {
+  const paintings = await getArtworksByCategory("paintings")
+
   return (
     <>
       <Navigation />
