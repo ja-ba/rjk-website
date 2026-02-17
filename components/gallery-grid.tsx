@@ -9,14 +9,14 @@ interface GalleryGridProps {
   artworks: Artwork[]
 }
 
-const GAP = 8
+export const GAP = 8
 
 /**
  * Row-based masonry: packs images into justified rows of a target height.
  * Each image is scaled so that the row fills the container width exactly,
  * producing varying image widths but a consistent row height.
  */
-function computeRows(
+export function computeRows(
   artworks: Artwork[],
   containerWidth: number,
   targetRowHeight: number

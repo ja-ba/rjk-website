@@ -1,0 +1,11 @@
+#!/bin/sh
+# Pre-commit hook: run tests before allowing a commit
+echo "Running tests before commit..."
+pnpm test
+status=$?
+if [ $status -ne 0 ]; then
+  echo ""
+  echo "Tests failed. Commit aborted."
+  echo "Fix the failing tests and try again, or use --no-verify to skip (not recommended)."
+fi
+exit $status
