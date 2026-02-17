@@ -11,4 +11,5 @@ node_modules/
 public/images/paintings/
 public/images/drawings/
 .vercel/
+tsconfig.tsbuildinfo
 prompt
