@@ -22,12 +22,12 @@ function getTitle(page: PageObjectResponse, prop: string): string {
   return ""
 }
 
-function getNumber(page: PageObjectResponse, prop: string): number {
+function getRichText(page: PageObjectResponse, prop: string): string {
   const p = page.properties[prop] as any
-  if (p?.type === "number" && p.number !== null) {
-    return p.number
+  if (p?.type === "rich_text" && p.rich_text.length > 0) {
+    return p.rich_text.map((t: any) => t.plain_text).join("")
   }
-  return 0
+  return ""
 }
 
 function getSelect(page: PageObjectResponse, prop: string): string {
@@ -106,11 +106,16 @@ async function main() {
   for (const page of pages) {
     const title = getTitle(page, "Title")
     const category = getSelect(page, "Category")
-    const sortOrder = getNumber(page, "Sort Order")
+    const filenameBase = getRichText(page, "filename")
     const imageUrl = getFileUrl(page, "Image")
 
-    const singular = category === "paintings" ? "painting" : "drawing"
-    const filename = `${singular}-${sortOrder}.jpg`
+    if (!filenameBase) {
+      console.log(`  SKIP: "${title}" — no filename set in Notion`)
+      skipped++
+      continue
+    }
+
+    const filename = `${filenameBase}.jpg`
     const filepath = join(PUBLIC_DIR, category, filename)
 
     if (!imageUrl) {
