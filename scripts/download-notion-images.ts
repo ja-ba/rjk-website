@@ -80,7 +80,6 @@ async function main() {
       checkbox: { equals: true },
     },
     sorts: [
-      { property: "Category", direction: "ascending" },
       { property: "Sort Order", direction: "ascending" },
     ],
   })
