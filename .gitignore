@@ -8,5 +8,9 @@ node_modules/
 .next/
 .env*.local
 .DS_Store
-public/
+public/images/paintings/
+public/images/drawings/
+public/images/blog/
+.vercel/
+tsconfig.tsbuildinfo
 prompt

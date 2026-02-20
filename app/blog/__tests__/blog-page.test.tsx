@@ -1,44 +1,45 @@
 import { render, screen } from '@testing-library/react'
 import BlogPage, { metadata } from '@/app/blog/page'
 
+vi.mock('@/lib/notion', () => ({
+  getBlogPosts: vi.fn().mockResolvedValue([
+    { slug: 'first-post', title: 'First Post', date: 'January 1, 2025', excerpt: 'First excerpt.' },
+    { slug: 'second-post', title: 'Second Post', date: 'February 1, 2025', excerpt: 'Second excerpt.' },
+  ]),
+}))
+
 vi.mock('next/navigation', () => ({
   usePathname: () => '/blog',
 }))
 
 describe('BlogPage', () => {
-  it('renders heading "Blog"', () => {
-    render(<BlogPage />)
+  it('renders heading "Blog"', async () => {
+    render(await BlogPage())
     expect(screen.getByRole('heading', { level: 1, name: 'Blog' })).toBeInTheDocument()
   })
 
-  it('renders all 5 blog post titles', () => {
-    render(<BlogPage />)
-    expect(screen.getByText('Studio Reflections: Winter Light')).toBeInTheDocument()
-    expect(screen.getByText('New Series: Tidal Memory')).toBeInTheDocument()
-    expect(screen.getByText('Exhibition at Galeria Nova, Barcelona')).toBeInTheDocument()
-    expect(screen.getByText('On Drawing as Thinking')).toBeInTheDocument()
-    expect(screen.getByText('Paris Residency: Looking Back')).toBeInTheDocument()
+  it('renders all blog post titles', async () => {
+    render(await BlogPage())
+    expect(screen.getByText('First Post')).toBeInTheDocument()
+    expect(screen.getByText('Second Post')).toBeInTheDocument()
   })
 
-  it('renders dates for each post', () => {
-    render(<BlogPage />)
-    expect(screen.getByText('January 15, 2025')).toBeInTheDocument()
-    expect(screen.getByText('November 3, 2024')).toBeInTheDocument()
-    expect(screen.getByText('September 12, 2024')).toBeInTheDocument()
-    expect(screen.getByText('June 28, 2024')).toBeInTheDocument()
-    expect(screen.getByText('March 5, 2024')).toBeInTheDocument()
+  it('renders dates for each post', async () => {
+    render(await BlogPage())
+    expect(screen.getByText('January 1, 2025')).toBeInTheDocument()
+    expect(screen.getByText('February 1, 2025')).toBeInTheDocument()
   })
 
-  it('renders "Read More" links for each post', () => {
-    render(<BlogPage />)
+  it('renders "Read More" links for each post', async () => {
+    render(await BlogPage())
     const readMoreLinks = screen.getAllByText('Read More')
-    expect(readMoreLinks).toHaveLength(5)
+    expect(readMoreLinks).toHaveLength(2)
   })
 
-  it('each post title links to /blog/{slug}', () => {
-    render(<BlogPage />)
-    const titleLink = screen.getByText('Studio Reflections: Winter Light')
-    expect(titleLink).toHaveAttribute('href', '/blog/studio-reflections-winter')
+  it('each post title links to /blog/{slug}', async () => {
+    render(await BlogPage())
+    const titleLink = screen.getByText('First Post')
+    expect(titleLink).toHaveAttribute('href', '/blog/first-post')
   })
 
   it('exports correct metadata', () => {
