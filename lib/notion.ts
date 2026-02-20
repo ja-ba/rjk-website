@@ -10,15 +10,16 @@ export type PageObjectResponse = Extract<
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY })
 
-if (!process.env.NOTION_BLOG_DATABASE_ID) {
-  throw new Error("Missing required environment variable: NOTION_BLOG_DATABASE_ID")
-}
-if (!process.env.NOTION_ARTWORK_DATABASE_ID) {
-  throw new Error("Missing required environment variable: NOTION_ARTWORK_DATABASE_ID")
+function requireEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) throw new Error(`Missing required environment variable: ${name}`)
+  return value
 }
 
-const BLOG_DB_ID = process.env.NOTION_BLOG_DATABASE_ID
-const ARTWORK_DB_ID = process.env.NOTION_ARTWORK_DATABASE_ID
+// Lazily read so that importing this module (e.g. for pure helpers like
+// resolveImageBlocks or queryAllPages) does not require all env vars to be set.
+const getBlogDbId = () => requireEnv("NOTION_BLOG_DATABASE_ID")
+const getArtworkDbId = () => requireEnv("NOTION_ARTWORK_DATABASE_ID")
 
 // --- Helper to extract Notion property values ---
 
@@ -116,7 +117,7 @@ export async function queryAllPages(
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
   const pages = await queryAllPages({
-    database_id: BLOG_DB_ID,
+    database_id: getBlogDbId(),
     filter: {
       property: "Published",
       checkbox: { equals: true },
@@ -171,7 +172,7 @@ export async function getBlogPostBySlug(
   slug: string
 ): Promise<BlogPostFull | null> {
   const response = await notion.databases.query({
-    database_id: BLOG_DB_ID,
+    database_id: getBlogDbId(),
     filter: {
       and: [
         { property: "Slug", rich_text: { equals: slug } },
@@ -205,7 +206,7 @@ export async function getBlogPostBySlug(
 
 export async function getAllBlogSlugs(): Promise<string[]> {
   const pages = await queryAllPages({
-    database_id: BLOG_DB_ID,
+    database_id: getBlogDbId(),
     filter: {
       property: "Published",
       checkbox: { equals: true },
@@ -221,7 +222,7 @@ export async function getArtworksByCategory(
   category: "paintings" | "drawings"
 ): Promise<Artwork[]> {
   const pages = await queryAllPages({
-    database_id: ARTWORK_DB_ID,
+    database_id: getArtworkDbId(),
     filter: {
       and: [
         { property: "Category", select: { equals: category } },
@@ -267,7 +268,7 @@ export interface ArtworkImageEntry {
 
 export async function getArtworkImageUrls(): Promise<ArtworkImageEntry[]> {
   const pages = await queryAllPages({
-    database_id: ARTWORK_DB_ID,
+    database_id: getArtworkDbId(),
     filter: {
       property: "Published",
       checkbox: { equals: true },
