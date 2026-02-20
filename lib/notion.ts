@@ -113,7 +113,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 
 // Rewrites hosted Notion image block URLs to local static paths.
 // Must use the same extension derivation logic as scripts/download-blog-images.ts.
-function resolveImageBlocks(blocks: NotionBlock[], slug: string): NotionBlock[] {
+export function resolveImageBlocks(blocks: NotionBlock[], slug: string): NotionBlock[] {
   return blocks.map((block) => {
     if (block.type !== "image" || !block.image) return block
     if (block.image.type === "external") return block
