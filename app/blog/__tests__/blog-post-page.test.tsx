@@ -1,36 +1,58 @@
 import { render, screen } from '@testing-library/react'
 import BlogPostPage, { generateStaticParams } from '@/app/blog/[slug]/page'
+import type { BlogPostFull } from '@/lib/types'
+
+const mockPost: BlogPostFull = {
+  slug: 'test-post',
+  title: 'Test Post Title',
+  date: 'January 15, 2025',
+  category: 'Studio',
+  blocks: [
+    {
+      id: 'block-1',
+      type: 'paragraph',
+      paragraph: {
+        rich_text: [
+          { plain_text: 'Test content paragraph.', href: null, annotations: { bold: false, italic: false, strikethrough: false, underline: false, code: false } },
+        ],
+      },
+    },
+  ],
+}
+
+vi.mock('@/lib/notion', () => ({
+  getBlogPostBySlug: vi.fn().mockImplementation((slug: string) =>
+    slug === 'test-post' ? Promise.resolve(mockPost) : Promise.resolve(null)
+  ),
+  getAllBlogSlugs: vi.fn().mockResolvedValue(['test-post', 'another-post']),
+}))
 
 vi.mock('next/navigation', () => ({
-  usePathname: () => '/blog/studio-reflections-winter',
+  usePathname: () => '/blog/test-post',
 }))
 
 describe('BlogPostPage', () => {
   describe('valid slug', () => {
     it('renders the post title', async () => {
-      const params = Promise.resolve({ slug: 'studio-reflections-winter' })
-      const jsx = await BlogPostPage({ params })
+      const jsx = await BlogPostPage({ params: Promise.resolve({ slug: 'test-post' }) })
       render(jsx)
-      expect(screen.getByText('Studio Reflections: Winter Light')).toBeInTheDocument()
+      expect(screen.getByText('Test Post Title')).toBeInTheDocument()
     })
 
     it('renders the post date', async () => {
-      const params = Promise.resolve({ slug: 'studio-reflections-winter' })
-      const jsx = await BlogPostPage({ params })
+      const jsx = await BlogPostPage({ params: Promise.resolve({ slug: 'test-post' }) })
       render(jsx)
       expect(screen.getByText('January 15, 2025')).toBeInTheDocument()
     })
 
     it('renders content paragraphs', async () => {
-      const params = Promise.resolve({ slug: 'studio-reflections-winter' })
-      const jsx = await BlogPostPage({ params })
+      const jsx = await BlogPostPage({ params: Promise.resolve({ slug: 'test-post' }) })
       render(jsx)
-      expect(screen.getByText(/winter months bring a particular quality/)).toBeInTheDocument()
+      expect(screen.getByText('Test content paragraph.')).toBeInTheDocument()
     })
 
     it('renders a "Back to Blog" link', async () => {
-      const params = Promise.resolve({ slug: 'studio-reflections-winter' })
-      const jsx = await BlogPostPage({ params })
+      const jsx = await BlogPostPage({ params: Promise.resolve({ slug: 'test-post' }) })
       render(jsx)
       const backLink = screen.getByText('Back to Blog')
       expect(backLink).toHaveAttribute('href', '/blog')
@@ -39,15 +61,13 @@ describe('BlogPostPage', () => {
 
   describe('invalid slug', () => {
     it('renders "Post not found." for an unknown slug', async () => {
-      const params = Promise.resolve({ slug: 'nonexistent-post' })
-      const jsx = await BlogPostPage({ params })
+      const jsx = await BlogPostPage({ params: Promise.resolve({ slug: 'nonexistent-post' }) })
       render(jsx)
       expect(screen.getByText('Post not found.')).toBeInTheDocument()
     })
 
     it('renders a link back to /blog', async () => {
-      const params = Promise.resolve({ slug: 'nonexistent-post' })
-      const jsx = await BlogPostPage({ params })
+      const jsx = await BlogPostPage({ params: Promise.resolve({ slug: 'nonexistent-post' }) })
       render(jsx)
       const backLink = screen.getByText('Back to Blog')
       expect(backLink).toHaveAttribute('href', '/blog')
@@ -55,9 +75,9 @@ describe('BlogPostPage', () => {
   })
 
   describe('generateStaticParams', () => {
-    it('returns all 5 slugs', async () => {
+    it('returns slugs from Notion', async () => {
       const params = await generateStaticParams()
-      expect(params).toHaveLength(5)
+      expect(params).toHaveLength(2)
     })
 
     it('each result has a slug property', async () => {

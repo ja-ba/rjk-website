@@ -207,7 +207,6 @@ export async function getArtworksByCategory(
     .map((page) => {
       const title = getTitle(page, "Title")
       const sortOrder = getNumber(page, "Sort Order")
-      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-")
 
       return {
         id: page.id,
