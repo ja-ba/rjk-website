@@ -85,10 +85,37 @@ function getFileUrl(page: PageObjectResponse, prop: string): string | null {
   return null
 }
 
+// --- Pagination Helper ---
+
+async function queryAllPages(
+  params: Parameters<typeof notion.databases.query>[0]
+): Promise<PageObjectResponse[]> {
+  const pages: PageObjectResponse[] = []
+  let cursor: string | undefined
+
+  do {
+    const response = await notion.databases.query({
+      ...params,
+      start_cursor: cursor,
+      page_size: 100,
+    })
+
+    for (const page of response.results) {
+      if ("properties" in page) {
+        pages.push(page as PageObjectResponse)
+      }
+    }
+
+    cursor = response.has_more ? response.next_cursor ?? undefined : undefined
+  } while (cursor)
+
+  return pages
+}
+
 // --- Blog Functions ---
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
-  const response = await notion.databases.query({
+  const pages = await queryAllPages({
     database_id: BLOG_DB_ID,
     filter: {
       property: "Published",
@@ -97,9 +124,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     sorts: [{ property: "Date", direction: "descending" }],
   })
 
-  return response.results
-    .filter((page): page is PageObjectResponse => "properties" in page)
-    .map((page) => {
+  return pages.map((page) => {
       const dateRaw = getDate(page, "Date")
       const date = dateRaw
         ? new Date(dateRaw).toLocaleDateString("en-US", {
@@ -179,7 +204,7 @@ export async function getBlogPostBySlug(
 }
 
 export async function getAllBlogSlugs(): Promise<string[]> {
-  const response = await notion.databases.query({
+  const pages = await queryAllPages({
     database_id: BLOG_DB_ID,
     filter: {
       property: "Published",
@@ -187,10 +212,7 @@ export async function getAllBlogSlugs(): Promise<string[]> {
     },
   })
 
-  return response.results
-    .filter((page): page is PageObjectResponse => "properties" in page)
-    .map((page) => getRichText(page, "Slug"))
-    .filter(Boolean)
+  return pages.map((page) => getRichText(page, "Slug")).filter(Boolean)
 }
 
 // --- Artwork Functions ---
@@ -198,7 +220,7 @@ export async function getAllBlogSlugs(): Promise<string[]> {
 export async function getArtworksByCategory(
   category: "paintings" | "drawings"
 ): Promise<Artwork[]> {
-  const response = await notion.databases.query({
+  const pages = await queryAllPages({
     database_id: ARTWORK_DB_ID,
     filter: {
       and: [
@@ -209,9 +231,7 @@ export async function getArtworksByCategory(
     sorts: [{ property: "Sort Order", direction: "ascending" }],
   })
 
-  return response.results
-    .filter((page): page is PageObjectResponse => "properties" in page)
-    .map((page) => {
+  return pages.map((page) => {
       const title = getTitle(page, "Title")
       const sortOrder = getNumber(page, "Sort Order")
 
@@ -246,7 +266,7 @@ export interface ArtworkImageEntry {
 }
 
 export async function getArtworkImageUrls(): Promise<ArtworkImageEntry[]> {
-  const response = await notion.databases.query({
+  const pages = await queryAllPages({
     database_id: ARTWORK_DB_ID,
     filter: {
       property: "Published",
@@ -258,14 +278,12 @@ export async function getArtworkImageUrls(): Promise<ArtworkImageEntry[]> {
     ],
   })
 
-  return response.results
-    .filter((page): page is PageObjectResponse => "properties" in page)
-    .map((page) => ({
-      category: getSelect(page, "Category") as "paintings" | "drawings",
-      sortOrder: getNumber(page, "Sort Order"),
-      title: getTitle(page, "Title"),
-      imageUrl: getFileUrl(page, "Image"),
-    }))
+  return pages.map((page) => ({
+    category: getSelect(page, "Category") as "paintings" | "drawings",
+    sortOrder: getNumber(page, "Sort Order"),
+    title: getTitle(page, "Title"),
+    imageUrl: getFileUrl(page, "Image"),
+  }))
 }
 
 // --- Block Fetching ---

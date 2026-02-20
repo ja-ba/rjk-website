@@ -70,23 +70,32 @@ async function downloadImage(
   }
 }
 
+async function queryAllPages(
+  params: Parameters<typeof notion.databases.query>[0]
+): Promise<PageObjectResponse[]> {
+  const pages: PageObjectResponse[] = []
+  let cursor: string | undefined
+  do {
+    const response = await notion.databases.query({ ...params, start_cursor: cursor, page_size: 100 })
+    for (const page of response.results) {
+      if ("properties" in page) pages.push(page as PageObjectResponse)
+    }
+    cursor = response.has_more ? response.next_cursor ?? undefined : undefined
+  } while (cursor)
+  return pages
+}
+
 async function main() {
   console.log("Fetching artwork entries from Notion...")
 
-  const response = await notion.databases.query({
+  const pages = await queryAllPages({
     database_id: ARTWORK_DB_ID,
     filter: {
       property: "Published",
       checkbox: { equals: true },
     },
-    sorts: [
-      { property: "Sort Order", direction: "ascending" },
-    ],
+    sorts: [{ property: "Sort Order", direction: "ascending" }],
   })
-
-  const pages = response.results.filter(
-    (page): page is PageObjectResponse => "properties" in page
-  )
 
   console.log(`Found ${pages.length} published artworks.`)
 
