@@ -42,6 +42,6 @@ jobs:
           NOTION_ARTWORK_DATABASE_ID: ${{ secrets.NOTION_ARTWORK_DATABASE_ID }}
       - name: Deploy to Vercel (preview)
         id: deploy
-        run: echo "url=$(pnpm dlx vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+        run: echo "url=$(pnpm dlx vercel deploy --prebuilt --name=preview --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
       - name: Print staging URL
         run: echo "Staging URL ${{ steps.deploy.outputs.url }}"
