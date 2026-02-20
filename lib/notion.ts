@@ -233,14 +233,14 @@ export async function getArtworksByCategory(
 
   return pages.map((page) => {
       const title = getTitle(page, "Title")
-      const sortOrder = getNumber(page, "Sort Order")
+      const filename = getRichText(page, "filename")
 
       return {
         id: page.id,
         title,
         year: getNumber(page, "Year"),
         material: getRichText(page, "Material"),
-        src: `/images/${category}/${category.slice(0, -1)}-${sortOrder}.jpg`,
+        src: filename ? `/images/${category}/${filename}.jpg` : "",
         width: getNumber(page, "Aspect Width"),
         height: getNumber(page, "Aspect Height"),
         category,
