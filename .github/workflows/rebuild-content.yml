@@ -32,6 +32,12 @@ jobs:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_ARTWORK_DATABASE_ID: ${{ secrets.NOTION_ARTWORK_DATABASE_ID }}
 
+      - name: Download blog post images from Notion
+        run: pnpm tsx scripts/download-blog-images.ts
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_BLOG_DATABASE_ID: ${{ secrets.NOTION_BLOG_DATABASE_ID }}
+
       - name: Pull Vercel environment
         run: pnpm dlx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 

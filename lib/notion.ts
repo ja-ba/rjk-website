@@ -1,3 +1,4 @@
+import { extname } from "path"
 import { Client } from "@notionhq/client"
 import type { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints"
 import type { Artwork, BlogPost, BlogPostFull, NotionBlock } from "./types"
@@ -110,6 +111,30 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     })
 }
 
+// Rewrites hosted Notion image block URLs to local static paths.
+// Must use the same extension derivation logic as scripts/download-blog-images.ts.
+function resolveImageBlocks(blocks: NotionBlock[], slug: string): NotionBlock[] {
+  return blocks.map((block) => {
+    if (block.type !== "image" || !block.image) return block
+    if (block.image.type === "external") return block
+
+    const fileUrl = block.image.file?.url
+    if (!fileUrl) return block
+
+    let ext: string
+    try {
+      ext = extname(new URL(fileUrl).pathname) || ".jpg"
+    } catch {
+      ext = ".jpg"
+    }
+
+    return {
+      ...block,
+      image: { ...block.image, localUrl: `/images/blog/${slug}/${block.id}${ext}` },
+    }
+  })
+}
+
 export async function getBlogPostBySlug(
   slug: string
 ): Promise<BlogPostFull | null> {
@@ -126,7 +151,7 @@ export async function getBlogPostBySlug(
   const page = response.results[0]
   if (!page || !("properties" in page)) return null
 
-  const blocks = await getPageBlocks(page.id)
+  const blocks = resolveImageBlocks(await getPageBlocks(page.id), slug)
 
   const dateRaw = getDate(page as PageObjectResponse, "Date")
   const date = dateRaw

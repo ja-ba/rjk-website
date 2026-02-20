@@ -114,6 +114,31 @@ export function renderNotionBlocks(blocks: NotionBlock[]): React.ReactNode[] {
           </li>
         )
 
+      case "image": {
+        if (!block.image) return null
+        const src =
+          block.image.type === "external"
+            ? block.image.external?.url
+            : block.image.localUrl
+        if (!src) return null
+        const captionText =
+          block.image.caption?.map((t) => t.plain_text).join("") ?? ""
+        return (
+          <figure key={block.id}>
+            <img
+              src={src}
+              alt={captionText || ""}
+              style={{ maxWidth: "100%", height: "auto", display: "block" }}
+            />
+            {captionText && (
+              <figcaption className="mt-2 text-xs text-muted-foreground text-center">
+                {captionText}
+              </figcaption>
+            )}
+          </figure>
+        )
+      }
+
       default:
         return null
     }

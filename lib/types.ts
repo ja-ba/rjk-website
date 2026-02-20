@@ -45,6 +45,13 @@ export interface NotionBlock {
   numbered_list_item?: {
     rich_text: NotionRichText[]
   }
+  image?: {
+    type: "file" | "external"
+    file?: { url: string }
+    external?: { url: string }
+    caption: NotionRichText[]
+    localUrl?: string // injected at build time by resolveImageBlocks(), not from Notion
+  }
 }
 
 export interface NotionRichText {

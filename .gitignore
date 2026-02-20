@@ -10,6 +10,7 @@ node_modules/
 .DS_Store
 public/images/paintings/
 public/images/drawings/
+public/images/blog/
 .vercel/
 tsconfig.tsbuildinfo
 prompt
