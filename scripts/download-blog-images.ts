@@ -1,25 +1,11 @@
-import { Client } from "@notionhq/client"
-import type { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints"
 import { writeFile, mkdir } from "fs/promises"
 import { existsSync } from "fs"
 import { join, extname } from "path"
-
-type PageObjectResponse = Extract<
-  QueryDatabaseResponse["results"][number],
-  { properties: Record<string, unknown> }
->
+import { queryAllPages, getRichText } from "../lib/notion"
+import { Client } from "@notionhq/client"
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY })
-const BLOG_DB_ID = process.env.NOTION_BLOG_DATABASE_ID!
 const PUBLIC_DIR = join(process.cwd(), "public", "images", "blog")
-
-function getRichText(page: PageObjectResponse, prop: string): string {
-  const p = page.properties[prop] as any
-  if (p?.type === "rich_text" && p.rich_text.length > 0) {
-    return p.rich_text.map((t: any) => t.plain_text).join("")
-  }
-  return ""
-}
 
 // Must use the same extension derivation logic as resolveImageBlocks() in lib/notion.ts.
 function getExtFromUrl(url: string): string {
@@ -67,26 +53,11 @@ async function getPageBlocks(pageId: string): Promise<any[]> {
   return blocks
 }
 
-async function queryAllPages(
-  params: Parameters<typeof notion.databases.query>[0]
-): Promise<PageObjectResponse[]> {
-  const pages: PageObjectResponse[] = []
-  let cursor: string | undefined
-  do {
-    const response = await notion.databases.query({ ...params, start_cursor: cursor, page_size: 100 })
-    for (const page of response.results) {
-      if ("properties" in page) pages.push(page as PageObjectResponse)
-    }
-    cursor = response.has_more ? response.next_cursor ?? undefined : undefined
-  } while (cursor)
-  return pages
-}
-
 async function main() {
   console.log("Fetching published blog posts from Notion...")
 
   const pages = await queryAllPages({
-    database_id: BLOG_DB_ID,
+    database_id: process.env.NOTION_BLOG_DATABASE_ID!,
     filter: { property: "Published", checkbox: { equals: true } },
     sorts: [{ property: "Date", direction: "descending" }],
   })

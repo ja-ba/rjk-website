@@ -1,52 +1,15 @@
-import { Client } from "@notionhq/client"
-import type { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints"
-
-type PageObjectResponse = Extract<
-  QueryDatabaseResponse["results"][number],
-  { properties: Record<string, unknown> }
->
 import { writeFile, mkdir } from "fs/promises"
 import { existsSync } from "fs"
 import { join } from "path"
-
-const notion = new Client({ auth: process.env.NOTION_API_KEY })
-const ARTWORK_DB_ID = process.env.NOTION_ARTWORK_DATABASE_ID!
+import {
+  queryAllPages,
+  getTitle,
+  getRichText,
+  getSelect,
+  getFileUrl,
+} from "../lib/notion"
 
 const PUBLIC_DIR = join(process.cwd(), "public", "images")
-
-function getTitle(page: PageObjectResponse, prop: string): string {
-  const p = page.properties[prop]
-  if (p?.type === "title" && p.title.length > 0) {
-    return p.title.map((t) => t.plain_text).join("")
-  }
-  return ""
-}
-
-function getRichText(page: PageObjectResponse, prop: string): string {
-  const p = page.properties[prop] as any
-  if (p?.type === "rich_text" && p.rich_text.length > 0) {
-    return p.rich_text.map((t: any) => t.plain_text).join("")
-  }
-  return ""
-}
-
-function getSelect(page: PageObjectResponse, prop: string): string {
-  const p = page.properties[prop] as any
-  if (p?.type === "select" && p.select) {
-    return p.select.name
-  }
-  return ""
-}
-
-function getFileUrl(page: PageObjectResponse, prop: string): string | null {
-  const p = page.properties[prop] as any
-  if (p?.type === "files" && Array.isArray(p.files) && p.files.length > 0) {
-    const file = p.files[0]
-    if (file.type === "file") return file.file.url
-    if (file.type === "external") return file.external.url
-  }
-  return null
-}
 
 async function downloadImage(
   url: string,
@@ -70,26 +33,11 @@ async function downloadImage(
   }
 }
 
-async function queryAllPages(
-  params: Parameters<typeof notion.databases.query>[0]
-): Promise<PageObjectResponse[]> {
-  const pages: PageObjectResponse[] = []
-  let cursor: string | undefined
-  do {
-    const response = await notion.databases.query({ ...params, start_cursor: cursor, page_size: 100 })
-    for (const page of response.results) {
-      if ("properties" in page) pages.push(page as PageObjectResponse)
-    }
-    cursor = response.has_more ? response.next_cursor ?? undefined : undefined
-  } while (cursor)
-  return pages
-}
-
 async function main() {
   console.log("Fetching artwork entries from Notion...")
 
   const pages = await queryAllPages({
-    database_id: ARTWORK_DB_ID,
+    database_id: process.env.NOTION_ARTWORK_DATABASE_ID!,
     filter: {
       property: "Published",
       checkbox: { equals: true },

@@ -3,7 +3,7 @@ import { Client } from "@notionhq/client"
 import type { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints"
 import type { Artwork, BlogPost, BlogPostFull, NotionBlock } from "./types"
 
-type PageObjectResponse = Extract<
+export type PageObjectResponse = Extract<
   QueryDatabaseResponse["results"][number],
   { properties: Record<string, unknown> }
 >
@@ -22,7 +22,7 @@ const ARTWORK_DB_ID = process.env.NOTION_ARTWORK_DATABASE_ID
 
 // --- Helper to extract Notion property values ---
 
-function getTitle(page: PageObjectResponse, prop: string): string {
+export function getTitle(page: PageObjectResponse, prop: string): string {
   const p = page.properties[prop]
   if (p?.type === "title" && p.title.length > 0) {
     return p.title.map((t) => t.plain_text).join("")
@@ -30,7 +30,7 @@ function getTitle(page: PageObjectResponse, prop: string): string {
   return ""
 }
 
-function getRichText(page: PageObjectResponse, prop: string): string {
+export function getRichText(page: PageObjectResponse, prop: string): string {
   const p = page.properties[prop]
   if (p?.type === "rich_text" && p.rich_text.length > 0) {
     return p.rich_text.map((t) => t.plain_text).join("")
@@ -47,7 +47,7 @@ function getNumber(page: PageObjectResponse, prop: string): number {
   return 0
 }
 
-function getSelect(page: PageObjectResponse, prop: string): string {
+export function getSelect(page: PageObjectResponse, prop: string): string {
   const p = page.properties[prop] as any
   if (p?.type === "select" && p.select) {
     return p.select.name
@@ -71,7 +71,7 @@ function getCheckbox(page: PageObjectResponse, prop: string): boolean {
   return false
 }
 
-function getFileUrl(page: PageObjectResponse, prop: string): string | null {
+export function getFileUrl(page: PageObjectResponse, prop: string): string | null {
   const p = page.properties[prop] as any
   if (p?.type === "files" && Array.isArray(p.files) && p.files.length > 0) {
     const file = p.files[0]
@@ -87,7 +87,7 @@ function getFileUrl(page: PageObjectResponse, prop: string): string | null {
 
 // --- Pagination Helper ---
 
-async function queryAllPages(
+export async function queryAllPages(
   params: Parameters<typeof notion.databases.query>[0]
 ): Promise<PageObjectResponse[]> {
   const pages: PageObjectResponse[] = []
