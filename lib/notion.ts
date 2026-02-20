@@ -10,8 +10,15 @@ type PageObjectResponse = Extract<
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY })
 
-const BLOG_DB_ID = process.env.NOTION_BLOG_DATABASE_ID!
-const ARTWORK_DB_ID = process.env.NOTION_ARTWORK_DATABASE_ID!
+if (!process.env.NOTION_BLOG_DATABASE_ID) {
+  throw new Error("Missing required environment variable: NOTION_BLOG_DATABASE_ID")
+}
+if (!process.env.NOTION_ARTWORK_DATABASE_ID) {
+  throw new Error("Missing required environment variable: NOTION_ARTWORK_DATABASE_ID")
+}
+
+const BLOG_DB_ID = process.env.NOTION_BLOG_DATABASE_ID
+const ARTWORK_DB_ID = process.env.NOTION_ARTWORK_DATABASE_ID
 
 // --- Helper to extract Notion property values ---
 

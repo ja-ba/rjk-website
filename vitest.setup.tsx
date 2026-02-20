@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom/vitest'
 
+// Provide stub env vars so lib/notion.ts module-level guards pass in tests
+process.env.NOTION_API_KEY = process.env.NOTION_API_KEY ?? 'test-api-key'
+process.env.NOTION_BLOG_DATABASE_ID = process.env.NOTION_BLOG_DATABASE_ID ?? 'test-blog-db-id'
+process.env.NOTION_ARTWORK_DATABASE_ID = process.env.NOTION_ARTWORK_DATABASE_ID ?? 'test-artwork-db-id'
+
 // Mock next/image globally -- replaces with a plain <img> tag
 vi.mock('next/image', () => ({
   default: ({ fill, priority, ...rest }: Record<string, unknown>) => {
