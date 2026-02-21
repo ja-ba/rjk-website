@@ -40,12 +40,10 @@ jobs:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_BLOG_DATABASE_ID: ${{ secrets.NOTION_BLOG_DATABASE_ID }}
           NOTION_ARTWORK_DATABASE_ID: ${{ secrets.NOTION_ARTWORK_DATABASE_ID }}
-      - name: Switch to preview branch for Vercel naming
-        run: git checkout -b preview 2>/dev/null || git checkout preview
-      - name: Deploy to Vercel (preview)
+      - name: Deploy staging build to Vercel
         id: deploy
         run: echo "url=$(pnpm dlx vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
-      - name: Alias to stable preview URL
-        run: pnpm dlx vercel alias set ${{ steps.deploy.outputs.url }} preview-rjk-jvb-website.vercel.app --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Alias to stable staging URL
+        run: pnpm dlx vercel alias set ${{ steps.deploy.outputs.url }} staging-rjk-jvb-website.vercel.app --token=${{ secrets.VERCEL_TOKEN }}
       - name: Print staging URL
         run: echo "Staging URL ${{ steps.deploy.outputs.url }}"
