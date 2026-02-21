@@ -14,63 +14,37 @@ async function handler(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const vercelToken = process.env.VERCEL_API_TOKEN
-  const projectId = process.env.VERCEL_PROJECT_ID
+  const owner = process.env.GITHUB_REPO_OWNER
+  const repo = process.env.GITHUB_REPO_NAME
+  const token = process.env.GITHUB_PAT
 
-  if (!vercelToken || !projectId) {
+  if (!owner || !repo || !token) {
     return NextResponse.json(
-      { error: 'Missing Vercel configuration' },
+      { error: 'Missing GitHub configuration' },
       { status: 500 }
     )
   }
 
-  // Find the most recent ready preview deployment
-  const listRes = await fetch(
-    `https://api.vercel.com/v6/deployments?projectId=${projectId}&target=preview&state=READY&limit=1`,
-    {
-      headers: {
-        Authorization: `Bearer ${vercelToken}`,
-      },
-    }
-  )
-
-  if (!listRes.ok) {
-    const text = await listRes.text()
-    return NextResponse.json(
-      { error: 'Failed to list deployments', detail: text },
-      { status: 502 }
-    )
-  }
-
-  const { deployments } = await listRes.json()
-  if (!deployments || deployments.length === 0) {
-    return NextResponse.json(
-      { error: 'No ready preview deployment found' },
-      { status: 404 }
-    )
-  }
-
-  const deployment = deployments[0]
-
-  // Promote to production
-  const promoteRes = await fetch(
-    `https://api.vercel.com/v10/deployments/${deployment.uid}/promote`,
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/dispatches`,
     {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${vercelToken}`,
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ event_type: 'notion-content-promote' }),
     }
   )
 
-  if (!promoteRes.ok) {
-    const text = await promoteRes.text()
+  if (!res.ok) {
+    const text = await res.text()
     return NextResponse.json(
-      { error: 'Promote failed', detail: text },
+      { error: 'GitHub dispatch failed', detail: text },
       { status: 502 }
     )
   }
 
-  return NextResponse.json({ promoted: true, url: deployment.url })
+  return NextResponse.json({ triggered: true })
 }

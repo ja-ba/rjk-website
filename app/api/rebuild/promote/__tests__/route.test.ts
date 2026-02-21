@@ -14,13 +14,12 @@ function makeRequest(url = 'http://localhost/api/rebuild/promote') {
   return new NextRequest(url)
 }
 
-const mockDeployment = { uid: 'dep-123', url: 'preview.vercel.app' }
-
 describe('/api/rebuild/promote', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.stubEnv('VERCEL_API_TOKEN', 'test-vercel-token')
-    vi.stubEnv('VERCEL_PROJECT_ID', 'test-project-id')
+    vi.stubEnv('GITHUB_PAT', 'test-token')
+    vi.stubEnv('GITHUB_REPO_OWNER', 'test-owner')
+    vi.stubEnv('GITHUB_REPO_NAME', 'test-repo')
   })
 
   it('returns 401 when secret is invalid', async () => {
@@ -31,61 +30,14 @@ describe('/api/rebuild/promote', () => {
     expect(body.error).toBe('Unauthorized')
   })
 
-  it('returns 500 when Vercel env vars are missing', async () => {
+  it('returns 500 when GitHub env vars are missing', async () => {
     mockValidateSecret.mockReturnValue(true)
-    vi.stubEnv('VERCEL_API_TOKEN', '')
+    vi.stubEnv('GITHUB_PAT', '')
     const res = await GET(makeRequest())
     expect(res.status).toBe(500)
   })
 
-  it('returns 404 when no preview deployment found', async () => {
-    mockValidateSecret.mockReturnValue(true)
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ deployments: [] }),
-    } as unknown as Response)
-
-    const res = await GET(makeRequest())
-    expect(res.status).toBe(404)
-  })
-
-  it('returns 200 and promoted:true on success', async () => {
-    mockValidateSecret.mockReturnValue(true)
-    global.fetch = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ deployments: [mockDeployment] }),
-      } as unknown as Response)
-      .mockResolvedValueOnce({ ok: true } as Response)
-
-    const res = await POST(makeRequest())
-    expect(res.status).toBe(200)
-    const body = await res.json()
-    expect(body).toEqual({ promoted: true, url: mockDeployment.url })
-  })
-
-  it('calls promote endpoint with correct deployment id', async () => {
-    mockValidateSecret.mockReturnValue(true)
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ deployments: [mockDeployment] }),
-      } as unknown as Response)
-      .mockResolvedValueOnce({ ok: true } as Response)
-    global.fetch = fetchMock
-
-    await GET(makeRequest())
-
-    expect(fetchMock).toHaveBeenNthCalledWith(
-      2,
-      `https://api.vercel.com/v10/deployments/${mockDeployment.uid}/promote`,
-      expect.objectContaining({ method: 'POST' })
-    )
-  })
-
-  it('returns 502 when list deployments fails', async () => {
+  it('returns 502 when GitHub dispatch fails', async () => {
     mockValidateSecret.mockReturnValue(true)
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
@@ -94,22 +46,32 @@ describe('/api/rebuild/promote', () => {
 
     const res = await GET(makeRequest())
     expect(res.status).toBe(502)
+    const body = await res.json()
+    expect(body.error).toBe('GitHub dispatch failed')
   })
 
-  it('returns 502 when promote call fails', async () => {
+  it('returns 200 and triggered:true on success', async () => {
     mockValidateSecret.mockReturnValue(true)
-    global.fetch = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ deployments: [mockDeployment] }),
-      } as unknown as Response)
-      .mockResolvedValueOnce({
-        ok: false,
-        text: () => Promise.resolve('error'),
-      } as unknown as Response)
+    global.fetch = vi.fn().mockResolvedValue({ ok: true } as Response)
 
-    const res = await GET(makeRequest())
-    expect(res.status).toBe(502)
+    const res = await POST(makeRequest())
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body).toEqual({ triggered: true })
+  })
+
+  it('dispatches notion-content-promote event type', async () => {
+    mockValidateSecret.mockReturnValue(true)
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true } as Response)
+    global.fetch = fetchMock
+
+    await GET(makeRequest())
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api.github.com/repos/test-owner/test-repo/dispatches',
+      expect.objectContaining({
+        body: JSON.stringify({ event_type: 'notion-content-promote' }),
+      })
+    )
   })
 })
