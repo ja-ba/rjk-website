@@ -74,4 +74,59 @@ describe('/api/rebuild/promote', () => {
       })
     )
   })
+
+  it('returns 502 when fetch throws a network error', async () => {
+    mockValidateSecret.mockReturnValue(true)
+    global.fetch = vi.fn().mockRejectedValue(new TypeError('fetch failed'))
+
+    const res = await GET(makeRequest())
+    expect(res.status).toBe(502)
+    const body = await res.json()
+    expect(body.error).toBe('Failed to reach GitHub API')
+  })
+
+  it('includes GitHub error detail in 502 response body', async () => {
+    mockValidateSecret.mockReturnValue(true)
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      text: () => Promise.resolve('Bad credentials'),
+    } as unknown as Response)
+
+    const res = await GET(makeRequest())
+    const body = await res.json()
+    expect(body.detail).toBe('Bad credentials')
+  })
+
+  it('sends Authorization Bearer header with GITHUB_PAT to GitHub API', async () => {
+    mockValidateSecret.mockReturnValue(true)
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true } as Response)
+    global.fetch = fetchMock
+
+    await GET(makeRequest())
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-token',
+        }),
+      })
+    )
+  })
+
+  it('returns 500 when GITHUB_REPO_OWNER is missing', async () => {
+    mockValidateSecret.mockReturnValue(true)
+    vi.stubEnv('GITHUB_REPO_OWNER', '')
+    const res = await GET(makeRequest())
+    expect(res.status).toBe(500)
+    const body = await res.json()
+    expect(body.error).toBe('Missing GitHub configuration')
+  })
+
+  it('returns 500 when GITHUB_REPO_NAME is missing', async () => {
+    mockValidateSecret.mockReturnValue(true)
+    vi.stubEnv('GITHUB_REPO_NAME', '')
+    const res = await GET(makeRequest())
+    expect(res.status).toBe(500)
+  })
 })
