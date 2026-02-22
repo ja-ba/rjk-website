@@ -33,6 +33,11 @@ Copy `.env.example` to `.env.local` and fill in the Notion credentials before ru
   - `artwork-data.ts` — Type re-exports only (data now lives in Notion)
 - **Build scripts** (`scripts/`): `download-notion-images.ts`, `download-blog-images.ts` download images at build time; one-off utilities also live here
 - **CI/CD**: `.github/workflows/` — Vercel preview/production deploy and content-rebuild workflows
+- **Rebuild API** (`app/api/rebuild/`):
+  - `_auth.ts` — shared secret validation helper
+  - `staging/route.ts` — fires `notion-content-staging` repository_dispatch to trigger a preview build
+  - `promote/route.ts` — promotes the most recent ready Vercel preview deployment to production
+  - Both endpoints accept `?secret=` query param or `Authorization: Bearer` header checked against `REBUILD_SECRET`
 - **Public folder**: `public/images/` dirs are git-ignored (populated at build time). Tests MUST NOT rely on files in `public/`
 
 ## Testing Rules
