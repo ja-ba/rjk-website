@@ -13,7 +13,7 @@ jobs:
         id: staging
         run: |
           uid=$(curl -sf \
-            -H "Authorization: Bearer ${{ secrets.VERCEL_API_TOKEN }}" \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
             "https://api.vercel.com/v13/deployments/staging-rjk-jvb-website.vercel.app" \
             | jq -r '.uid')
           echo "uid=$uid" >> $GITHUB_OUTPUT
@@ -21,7 +21,7 @@ jobs:
       - name: Promote to production
         run: |
           curl -sf -X POST \
-            -H "Authorization: Bearer ${{ secrets.VERCEL_API_TOKEN }}" \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{}' \
             "https://api.vercel.com/v10/deployments/${{ steps.staging.outputs.uid }}/promote"

@@ -73,5 +73,7 @@ describe('/api/rebuild/staging', () => {
 
     const res = await GET(makeRequest())
     expect(res.status).toBe(502)
+    const body = await res.json()
+    expect(body.error).toBe('GitHub dispatch failed')
   })
 })
