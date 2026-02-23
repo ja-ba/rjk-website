@@ -25,23 +25,36 @@ async function handler(req: NextRequest) {
     )
   }
 
-  const res = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/dispatches`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ event_type: 'notion-content-promote' }),
-    }
-  )
+  let res: Response
+  try {
+    res = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/dispatches`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ event_type: 'notion-content-promote' }),
+      }
+    )
+  } catch (err) {
+    console.error('[rebuild/promote] fetch to GitHub failed:', err)
+    return NextResponse.json(
+      { error: 'Failed to reach GitHub API', detail: String(err) },
+      { status: 502 }
+    )
+  }
 
   if (!res.ok) {
-    const text = await res.text()
+    let detail = '(could not read response body)'
+    try {
+      detail = await res.text()
+    } catch {}
+    console.error(`[rebuild/promote] GitHub API returned ${res.status}: ${detail}`)
     return NextResponse.json(
-      { error: 'GitHub dispatch failed', detail: text },
+      { error: 'GitHub dispatch failed', detail },
       { status: 502 }
     )
   }

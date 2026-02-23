@@ -36,7 +36,7 @@ Copy `.env.example` to `.env.local` and fill in the Notion credentials before ru
 - **Rebuild API** (`app/api/rebuild/`):
   - `_auth.ts` — shared secret validation helper
   - `staging/route.ts` — fires `notion-content-staging` repository_dispatch to trigger a preview build
-  - `promote/route.ts` — promotes the most recent ready Vercel preview deployment to production
+  - `promote/route.ts` — fires `notion-content-promote` repository_dispatch to trigger a fresh production build and deploy
   - Both endpoints accept `?secret=` query param or `Authorization: Bearer` header checked against `REBUILD_SECRET`
 - **Public folder**: `public/images/` dirs are git-ignored (populated at build time). Tests MUST NOT rely on files in `public/`
 

@@ -49,7 +49,30 @@ describe('validateSecret', () => {
 
   it('rejects when REBUILD_SECRET is not set', () => {
     vi.stubEnv('REBUILD_SECRET', '')
-    const req = makeRequest('http://localhost/api/rebuild/staging?secret=')
+    const req = makeRequest('http://localhost/api/rebuild/staging?secret=anything')
+    expect(validateSecret(req)).toBe(false)
+  })
+
+  it('rejects when REBUILD_SECRET is whitespace only', () => {
+    vi.stubEnv('REBUILD_SECRET', '   ')
+    const req = makeRequest('http://localhost/api/rebuild/staging?secret=   ')
+    expect(validateSecret(req)).toBe(false)
+  })
+
+  it('query param secret takes precedence over Authorization header', () => {
+    const req = makeRequest(
+      'http://localhost/api/rebuild/staging?secret=correct-secret',
+      { Authorization: 'Bearer wrong-secret' }
+    )
+    expect(validateSecret(req)).toBe(true)
+  })
+
+  it('rejects when ?secret= is blank even if Authorization header is valid', () => {
+    const req = makeRequest(
+      'http://localhost/api/rebuild/staging?secret=',
+      { Authorization: 'Bearer correct-secret' }
+    )
+    // empty string is not nullish so ?? falls through; '' !== 'correct-secret'
     expect(validateSecret(req)).toBe(false)
   })
 })
