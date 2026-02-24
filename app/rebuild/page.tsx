@@ -12,26 +12,44 @@ export default function RebuildPage() {
   async function triggerRebuild(endpoint: '/api/rebuild/staging' | '/api/rebuild/promote') {
     setStatus('loading')
     setMessage('')
+
+    let res: Response
     try {
-      const res = await fetch(endpoint, {
+      res = await fetch(endpoint, {
         method: 'POST',
         headers: { Authorization: `Bearer ${password}` },
       })
-      const data = await res.json()
-      if (res.ok && data.triggered) {
-        setStatus('success')
-        setMessage(
-          endpoint === '/api/rebuild/staging'
-            ? 'Staging rebuild triggered.'
-            : 'Production promote triggered.'
-        )
-      } else {
-        setStatus('error')
-        setMessage(data.error ?? 'Unknown error')
-      }
     } catch (err) {
+      console.error('[rebuild] fetch failed:', err)
       setStatus('error')
-      setMessage(String(err))
+      setMessage('Could not reach the server. Check your connection and try again.')
+      return
+    }
+
+    let data: { triggered?: boolean; error?: string }
+    try {
+      data = await res.json()
+    } catch (err) {
+      console.error('[rebuild] failed to parse response:', err)
+      setStatus('error')
+      setMessage(`Server responded with status ${res.status} but returned an unexpected format. Check server logs.`)
+      return
+    }
+
+    if (res.ok && data.triggered) {
+      setStatus('success')
+      setMessage(
+        endpoint === '/api/rebuild/staging'
+          ? 'Staging rebuild triggered.'
+          : 'Production promote triggered.'
+      )
+    } else if (!res.ok) {
+      setStatus('error')
+      setMessage(data.error ?? `Request failed (HTTP ${res.status}). Try again or check server logs.`)
+    } else {
+      console.error('[rebuild] unexpected response shape:', data)
+      setStatus('error')
+      setMessage('The server responded successfully but the rebuild status is unknown. Check server logs.')
     }
   }
 
