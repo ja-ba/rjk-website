@@ -26,17 +26,32 @@ export default function RebuildPage() {
       return
     }
 
-    let data: { triggered?: boolean; error?: string }
+    let data: unknown
     try {
       data = await res.json()
     } catch (err) {
-      console.error('[rebuild] failed to parse response:', err)
+      if (err instanceof SyntaxError) {
+        console.error('[rebuild] failed to parse response as JSON:', err)
+        setStatus('error')
+        setMessage(`Server responded with status ${res.status} but returned an unexpected format. Check server logs.`)
+      } else {
+        console.error('[rebuild] unexpected error reading response:', err)
+        setStatus('error')
+        setMessage('An unexpected error occurred reading the server response. Check server logs.')
+      }
+      return
+    }
+
+    if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+      console.error('[rebuild] response JSON was not an object:', data)
       setStatus('error')
       setMessage(`Server responded with status ${res.status} but returned an unexpected format. Check server logs.`)
       return
     }
 
-    if (res.ok && data.triggered) {
+    const payload = data as { triggered?: boolean; error?: string }
+
+    if (res.ok && payload.triggered) {
       setStatus('success')
       setMessage(
         endpoint === '/api/rebuild/staging'
@@ -45,9 +60,9 @@ export default function RebuildPage() {
       )
     } else if (!res.ok) {
       setStatus('error')
-      setMessage(data.error ?? `Request failed (HTTP ${res.status}). Try again or check server logs.`)
+      setMessage(payload.error ?? `Request failed (HTTP ${res.status}). Try again or check server logs.`)
     } else {
-      console.error('[rebuild] unexpected response shape:', data)
+      console.error('[rebuild] unexpected response shape:', payload)
       setStatus('error')
       setMessage('The server responded successfully but the rebuild status is unknown. Check server logs.')
     }

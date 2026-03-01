@@ -134,6 +134,48 @@ describe('RebuildPage', () => {
     )
   })
 
+  it('shows error when json() throws a non-SyntaxError', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => { throw new TypeError('stream consumed') },
+    })
+    render(<RebuildPage />)
+    await userEvent.type(screen.getByLabelText(/password/i), 'mysecret')
+    await userEvent.click(screen.getByRole('button', { name: /staging/i }))
+    await waitFor(() =>
+      expect(screen.getByText(/unexpected error occurred reading/i)).toBeInTheDocument()
+    )
+  })
+
+  it('shows error when response JSON is null', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => null,
+    })
+    render(<RebuildPage />)
+    await userEvent.type(screen.getByLabelText(/password/i), 'mysecret')
+    await userEvent.click(screen.getByRole('button', { name: /staging/i }))
+    await waitFor(() =>
+      expect(screen.getByText(/unexpected format/i)).toBeInTheDocument()
+    )
+  })
+
+  it('shows fallback HTTP status message when non-ok response has no error field', async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 403,
+      json: async () => ({}),
+    })
+    render(<RebuildPage />)
+    await userEvent.type(screen.getByLabelText(/password/i), 'mysecret')
+    await userEvent.click(screen.getByRole('button', { name: /staging/i }))
+    await waitFor(() =>
+      expect(screen.getByText(/request failed \(http 403\)/i)).toBeInTheDocument()
+    )
+  })
+
   it('disables buttons and shows ellipsis while fetch is in flight', async () => {
     let resolveFetch!: (value: unknown) => void
     mockFetch.mockReturnValue(new Promise((resolve) => { resolveFetch = resolve }))
@@ -147,5 +189,8 @@ describe('RebuildPage', () => {
       expect(btn).toHaveTextContent('…')
     })
     resolveFetch({ ok: true, json: async () => ({ triggered: true }) })
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /staging/i })).not.toBeDisabled()
+    )
   })
 })
