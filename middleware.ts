@@ -7,6 +7,7 @@ export function middleware(req: NextRequest) {
     return new NextResponse(null, { status: 404 })
   }
   if (!host.endsWith('.vercel.app')) {
+    console.warn(`[middleware] /rebuild blocked for non-vercel.app host: ${host}`)
     return new NextResponse(null, { status: 404 })
   }
   return NextResponse.next()

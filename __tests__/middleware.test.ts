@@ -44,4 +44,19 @@ describe('middleware', () => {
     const res = middleware(makeRequest('evil.vercel.app.attacker.com'))
     expect(res.status).toBe(404)
   })
+
+  it('blocks localhost (page is only accessible on .vercel.app preview URLs)', () => {
+    const res = middleware(makeRequest('localhost'))
+    expect(res.status).toBe(404)
+  })
+
+  it('blocks localhost with port number', () => {
+    const res = middleware(makeRequest('localhost:3000'))
+    expect(res.status).toBe(404)
+  })
+
+  it('blocks IPv4 loopback address', () => {
+    const res = middleware(makeRequest('127.0.0.1:3000'))
+    expect(res.status).toBe(404)
+  })
 })
