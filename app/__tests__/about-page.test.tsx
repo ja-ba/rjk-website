@@ -19,16 +19,16 @@ describe('AboutPage', () => {
 
   it('renders contact email', () => {
     render(<AboutPage />)
-    expect(screen.getByText('studio@elenavasquez.com')).toBeInTheDocument()
+    expect(screen.getByText('studio@Rebeccavasquez.com')).toBeInTheDocument()
   })
 
   it('renders the portrait image', () => {
     render(<AboutPage />)
-    expect(screen.getByAltText('Elena Vasquez in her studio')).toBeInTheDocument()
+    expect(screen.getByAltText('Rebecca Kleinberg in her studio')).toBeInTheDocument()
   })
 
   it('exports correct metadata', () => {
-    expect(metadata.title).toBe('About | Elena Vasquez')
+    expect(metadata.title).toBe('About | Rebecca Kleinberg')
     expect(metadata.description).toBeTruthy()
   })
 })

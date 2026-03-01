@@ -3,8 +3,8 @@ import { Navigation } from "@/components/navigation"
 import { getBlogPosts } from "@/lib/notion"
 
 export const metadata = {
-  title: "Blog | Elena Vasquez",
-  description: "Writings and updates from the studio of Elena Vasquez.",
+  title: "Blog | Rebecca Kleinberg",
+  description: "Writings and updates from the studio of Rebecca Kleinberg.",
 }
 
 export default async function BlogPage() {

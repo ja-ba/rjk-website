@@ -3,8 +3,8 @@ import { GalleryGrid } from "@/components/gallery-grid"
 import { getArtworksByCategory } from "@/lib/notion"
 
 export const metadata = {
-  title: "Paintings | Elena Vasquez",
-  description: "Painting works by Elena Vasquez. Oil, acrylic, and mixed media on canvas.",
+  title: "Paintings | Rebecca Kleinberg",
+  description: "Painting works by Rebecca Kleinberg. Oil, acrylic, and mixed media on canvas.",
 }
 
 export default async function PaintingsPage() {
