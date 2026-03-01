@@ -23,7 +23,7 @@ Copy `.env.example` to `.env.local` and fill in the Notion credentials before ru
 ## Architecture
 - **App Router** (Next.js 16): Pages in `app/`, components in `components/`, utilities in `lib/`, hooks in `hooks/`
 - **Path alias**: `@/*` maps to project root
-- **Pages**: `app/page.tsx` (home), `app/about/`, `app/work/paintings/`, `app/work/drawings/`, `app/blog/` (listing + `[slug]` dynamic route)
+- **Pages**: `app/page.tsx` (home), `app/about/`, `app/work/paintings/`, `app/work/drawings/`, `app/blog/` (listing + `[slug]` dynamic route), `app/rebuild/` (password-protected rebuild trigger UI, `.vercel.app`-only)
 - **UI components**: `components/ui/` contains shadcn/ui primitives -- DO NOT modify or test these
 - **Custom components**: `components/gallery-grid.tsx`, `components/lightbox.tsx`, `components/navigation.tsx`
 - **Notion layer** (`lib/`):
@@ -38,6 +38,7 @@ Copy `.env.example` to `.env.local` and fill in the Notion credentials before ru
   - `staging/route.ts` — fires `notion-content-staging` repository_dispatch to trigger a preview build
   - `promote/route.ts` — fires `notion-content-promote` repository_dispatch to trigger a fresh production build and deploy
   - Both endpoints accept `?secret=` query param or `Authorization: Bearer` header checked against `REBUILD_SECRET`
+- **Middleware** (`middleware.ts`): Restricts `/rebuild` to `.vercel.app` domains only (blocks the page on production custom domains)
 - **Public folder**: `public/images/` dirs are git-ignored (populated at build time). Tests MUST NOT rely on files in `public/`
 
 ## Testing Rules

@@ -54,6 +54,10 @@ export interface NotionBlock {
   }
 }
 
+export type RebuildApiResponse =
+  | { triggered: true }
+  | { error: string; detail?: string }
+
 export interface NotionRichText {
   plain_text: string
   href: string | null
