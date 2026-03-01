@@ -129,4 +129,17 @@ describe('/api/rebuild/promote', () => {
     const res = await GET(makeRequest())
     expect(res.status).toBe(500)
   })
+
+  it('returns 502 with fallback detail when res.text() throws while reading GitHub error body', async () => {
+    mockValidateSecret.mockReturnValue(true)
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      text: () => Promise.reject(new Error('stream already consumed')),
+    } as unknown as Response)
+    const res = await GET(makeRequest())
+    expect(res.status).toBe(502)
+    const body = await res.json()
+    expect(body.error).toBe('GitHub dispatch failed')
+    expect(body.detail).toBe('(failed to read response body)')
+  })
 })

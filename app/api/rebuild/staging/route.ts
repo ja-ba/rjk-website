@@ -51,7 +51,10 @@ async function handler(req: NextRequest) {
     let detail = '(could not read response body)'
     try {
       detail = await res.text()
-    } catch {}
+    } catch (bodyErr) {
+      console.error('[rebuild/staging] failed to read GitHub error response body:', bodyErr)
+      detail = '(failed to read response body)'
+    }
     console.error(`[rebuild/staging] GitHub API returned ${res.status}: ${detail}`)
     return NextResponse.json(
       { error: 'GitHub dispatch failed', detail },
