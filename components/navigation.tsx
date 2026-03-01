@@ -20,7 +20,7 @@ export function Navigation() {
           href="/"
           className="font-serif text-lg tracking-wide text-foreground transition-opacity hover:opacity-70"
         >
-          Elena Vasquez
+          Rebecca Kleinberg
         </Link>
 
         {/* Desktop Navigation */}

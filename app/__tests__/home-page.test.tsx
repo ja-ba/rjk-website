@@ -6,9 +6,9 @@ vi.mock('next/navigation', () => ({
 }))
 
 describe('HomePage', () => {
-  it('renders the hero heading "Elena Vasquez"', () => {
+  it('renders the hero heading "Rebecca Kleinberg"', () => {
     render(<HomePage />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Elena Vasquez' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Rebecca Kleinberg' })).toBeInTheDocument()
   })
 
   it('renders the hero description text', () => {
@@ -24,6 +24,6 @@ describe('HomePage', () => {
 
   it('renders a hero image with alt text', () => {
     render(<HomePage />)
-    expect(screen.getByAltText('Featured artwork by Elena Vasquez')).toBeInTheDocument()
+    expect(screen.getByAltText('Featured artwork by Rebecca Kleinberg')).toBeInTheDocument()
   })
 })

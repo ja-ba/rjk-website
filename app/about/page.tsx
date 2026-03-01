@@ -2,8 +2,8 @@ import Image from "next/image"
 import { Navigation } from "@/components/navigation"
 
 export const metadata = {
-  title: "About | Elena Vasquez",
-  description: "Learn about Elena Vasquez, contemporary artist working across painting and drawing.",
+  title: "About | Rebecca Kleinberg",
+  description: "Learn about Rebecca Kleinberg, contemporary artist working across painting and drawing.",
 }
 
 export default function AboutPage() {
@@ -17,7 +17,7 @@ export default function AboutPage() {
             <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
               <Image
                 src="/images/about-portrait.jpg"
-                alt="Elena Vasquez in her studio"
+                alt="Rebecca Kleinberg in her studio"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 40vw"
@@ -34,7 +34,7 @@ export default function AboutPage() {
 
             <div className="mt-6 flex flex-col gap-5 text-sm leading-relaxed text-muted-foreground max-w-lg">
               <p>
-                Elena Vasquez is a contemporary artist based in Barcelona, working
+                Rebecca Kleinberg is a contemporary artist based in Barcelona, working
                 primarily in oil painting and drawing. Her practice explores the
                 tension between abstraction and figuration, seeking to capture fleeting
                 emotional states through color, gesture, and form.
@@ -42,7 +42,7 @@ export default function AboutPage() {
               <p>
                 After studying Fine Arts at the Universitat de Barcelona and
                 completing a residency at the Cit{'e\u0301'} Internationale des Arts in Paris,
-                Elena has exhibited widely across Europe and North America. Her work
+                Rebecca has exhibited widely across Europe and North America. Her work
                 is held in private collections in Madrid, London, New York, and
                 Tokyo.
               </p>
@@ -53,7 +53,7 @@ export default function AboutPage() {
                 larger compositions, rooted in direct observation.
               </p>
               <p>
-                Elena currently lives and works in the El Born neighborhood of
+                Rebecca currently lives and works in the El Born neighborhood of
                 Barcelona.
               </p>
             </div>
@@ -62,7 +62,7 @@ export default function AboutPage() {
             <div className="mt-10 flex flex-col gap-2 text-xs tracking-widest uppercase text-muted-foreground">
               <div className="flex items-center gap-2">
                 <span className="w-8 h-px bg-border" />
-                <span>studio@elenavasquez.com</span>
+                <span>studio@Rebeccavasquez.com</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-8 h-px bg-border" />

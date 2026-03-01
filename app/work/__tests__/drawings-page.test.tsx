@@ -31,7 +31,7 @@ describe('DrawingsPage', () => {
   })
 
   it('exports correct metadata', () => {
-    expect(metadata.title).toBe('Drawings | Elena Vasquez')
+    expect(metadata.title).toBe('Drawings | Rebecca Kleinberg')
     expect(metadata.description).toBeTruthy()
   })
 })
