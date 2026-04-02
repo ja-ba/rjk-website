@@ -25,8 +25,7 @@ export default function HomePage() {
               Rebecca Kleinberg
             </h1>
             <p className="mt-3 text-sm md:text-base text-background/80 tracking-wide max-w-md">
-              Contemporary painter exploring the boundaries between
-              abstraction and figuration.
+              
             </p>
             <Link
               href="/work/paintings"

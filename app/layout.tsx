@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: 'Rebecca Kleinberg | Artist',
-  description: 'Portfolio of Rebecca Kleinberg, contemporary artist working in painting and drawing. Exploring the boundaries between abstraction and figuration.',
+  description: 'Portfolio of Rebecca Kleinberg, artist',
 }
 
 export default function RootLayout({

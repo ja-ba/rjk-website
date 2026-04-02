@@ -19,7 +19,7 @@ export default async function DrawingsPage() {
             Drawings
           </h1>
           <p className="mt-2 text-sm text-muted-foreground max-w-lg">
-            Works on paper in charcoal, graphite, and ink. Studies in line, shadow, and observation.
+            
           </p>
         </div>
         <GalleryGrid artworks={drawings} />
