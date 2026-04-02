@@ -19,11 +19,6 @@ describe('DrawingsPage', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Drawings' })).toBeInTheDocument()
   })
 
-  it('renders the description text', async () => {
-    render(await DrawingsPage())
-    expect(screen.getByText(/Works on paper in charcoal, graphite, and ink/)).toBeInTheDocument()
-  })
-
   it('renders artwork buttons from drawings data', async () => {
     render(await DrawingsPage())
     const buttons = screen.getAllByRole('button', { name: /^View / })
@@ -31,7 +26,7 @@ describe('DrawingsPage', () => {
   })
 
   it('exports correct metadata', () => {
-    expect(metadata.title).toBe('Drawings | Elena Vasquez')
+    expect(metadata.title).toBe('Drawings | Rebecca Kleinberg')
     expect(metadata.description).toBeTruthy()
   })
 })

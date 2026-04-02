@@ -7,7 +7,7 @@
 This installs dependencies and registers the pre-commit hook that runs `pnpm test` before every commit.
 
 ## Project Overview
-Artist portfolio website for Elena Vasquez built with Next.js 16, React 19, TypeScript, Tailwind CSS, and shadcn/ui. Content (artwork, blog posts) is stored in **Notion** and fetched via the Notion API. Images are downloaded from Notion at build time into `public/images/` (git-ignored).
+Artist portfolio website for Rebecca Kleinberg built with Next.js 16, React 19, TypeScript, Tailwind CSS, and shadcn/ui. Content (artwork, blog posts) is stored in **Notion** and fetched via the Notion API. Images are downloaded from Notion at build time into `public/images/` (git-ignored).
 
 ## Environment Variables
 Copy `.env.example` to `.env.local` and fill in the Notion credentials before running locally.

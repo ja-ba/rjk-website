@@ -3,8 +3,8 @@ import { GalleryGrid } from "@/components/gallery-grid"
 import { getArtworksByCategory } from "@/lib/notion"
 
 export const metadata = {
-  title: "Drawings | Elena Vasquez",
-  description: "Drawing works by Elena Vasquez. Charcoal, graphite, and ink on paper.",
+  title: "Drawings | Rebecca Kleinberg",
+  description: "Drawing works by Rebecca Kleinberg. Charcoal, graphite, and ink on paper.",
 }
 
 export default async function DrawingsPage() {
@@ -18,9 +18,6 @@ export default async function DrawingsPage() {
           <h1 className="font-serif text-2xl md:text-3xl text-foreground">
             Drawings
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground max-w-lg">
-            Works on paper in charcoal, graphite, and ink. Studies in line, shadow, and observation.
-          </p>
         </div>
         <GalleryGrid artworks={drawings} />
       </main>

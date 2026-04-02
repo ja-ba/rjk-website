@@ -43,7 +43,7 @@ describe('BlogPage', () => {
   })
 
   it('exports correct metadata', () => {
-    expect(metadata.title).toBe('Blog | Elena Vasquez')
+    expect(metadata.title).toBe('Blog | Rebecca Kleinberg')
     expect(metadata.description).toBeTruthy()
   })
 })

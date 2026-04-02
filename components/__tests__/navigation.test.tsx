@@ -15,7 +15,7 @@ describe('Navigation', () => {
   describe('rendering', () => {
     it('renders the artist name link pointing to "/"', () => {
       render(<Navigation />)
-      const link = screen.getByText('Elena Vasquez')
+      const link = screen.getByText('Rebecca Kleinberg')
       expect(link).toHaveAttribute('href', '/')
     })
 

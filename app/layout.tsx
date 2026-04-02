@@ -14,8 +14,8 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: 'Elena Vasquez | Artist & Painter',
-  description: 'Portfolio of Elena Vasquez, contemporary artist working in painting and drawing. Exploring the boundaries between abstraction and figuration.',
+  title: 'Rebecca Kleinberg | Artist',
+  description: 'Portfolio of Rebecca Kleinberg, artist',
 }
 
 export default function RootLayout({

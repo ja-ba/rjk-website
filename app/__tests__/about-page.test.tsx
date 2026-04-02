@@ -8,27 +8,26 @@ vi.mock('next/navigation', () => ({
 describe('AboutPage', () => {
   it('renders the heading "About"', () => {
     render(<AboutPage />)
-    expect(screen.getByRole('heading', { level: 1, name: 'About' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'About' })).toBeInTheDocument()
   })
 
-  it('renders biography text mentioning "Barcelona"', () => {
+  it('renders biography text mentioning "Seattle"', () => {
     render(<AboutPage />)
-    const matches = screen.getAllByText(/Barcelona/)
-    expect(matches.length).toBeGreaterThan(0)
+    expect(screen.getByText(/Seattle/)).toBeInTheDocument()
   })
 
-  it('renders contact email', () => {
+  it('renders the Instagram link', () => {
     render(<AboutPage />)
-    expect(screen.getByText('studio@elenavasquez.com')).toBeInTheDocument()
+    expect(screen.getByText('Instagram')).toBeInTheDocument()
   })
 
   it('renders the portrait image', () => {
     render(<AboutPage />)
-    expect(screen.getByAltText('Elena Vasquez in her studio')).toBeInTheDocument()
+    expect(screen.getByAltText('Rebecca Kleinberg plein air painting at Smith Rock')).toBeInTheDocument()
   })
 
   it('exports correct metadata', () => {
-    expect(metadata.title).toBe('About | Elena Vasquez')
+    expect(metadata.title).toBe('About | Rebecca Kleinberg')
     expect(metadata.description).toBeTruthy()
   })
 })
