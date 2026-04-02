@@ -11,9 +11,9 @@ describe('HomePage', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Rebecca Kleinberg' })).toBeInTheDocument()
   })
 
-  it('renders the hero description text', () => {
+  it('renders a "View Work" link', () => {
     render(<HomePage />)
-    expect(screen.getByText(/Contemporary painter exploring/)).toBeInTheDocument()
+    expect(screen.getByText('View Work')).toBeInTheDocument()
   })
 
   it('renders a "View Work" link pointing to "/work/paintings"', () => {

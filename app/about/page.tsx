@@ -43,18 +43,6 @@ export default function AboutPage() {
             <div className="mt-6 flex flex-col gap-5 text-sm leading-relaxed text-muted-foreground max-w-lg">
               <p>
                 My goal is to make art that people want to look at because it makes them think or feel something. The art that has been most interesting and meaningful to me is art that evokes a feeling of recognition of our shared world - whether it’s the beauty or ugliness of that world - and recognition of some truth, however small or seemingly insignificant. I seek to find and portray small moments of truth in order to give the viewer this sense of recognition. I believe that any subject portrayed honestly and sympathetically, showing the inherent balance and harmony in our physical world, and striving for the essence of a thing, makes for successful artwork.
-
-
-              </p>
-
-              <p>
-                
-              </p>
-              <p>
-                
-              </p>
-              <p>
-                
               </p>
             </div>
 

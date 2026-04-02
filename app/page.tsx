@@ -24,9 +24,6 @@ export default function HomePage() {
             <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl text-background leading-tight">
               Rebecca Kleinberg
             </h1>
-            <p className="mt-3 text-sm md:text-base text-background/80 tracking-wide max-w-md">
-              
-            </p>
             <Link
               href="/work/paintings"
               className="mt-6 inline-block border border-background/60 px-6 py-2.5 text-xs tracking-widest uppercase text-background/90 transition-all hover:bg-background hover:text-foreground"

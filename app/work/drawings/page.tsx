@@ -18,9 +18,6 @@ export default async function DrawingsPage() {
           <h1 className="font-serif text-2xl md:text-3xl text-foreground">
             Drawings
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground max-w-lg">
-            
-          </p>
         </div>
         <GalleryGrid artworks={drawings} />
       </main>
