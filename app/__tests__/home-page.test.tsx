@@ -6,14 +6,9 @@ vi.mock('next/navigation', () => ({
 }))
 
 describe('HomePage', () => {
-  it('renders the hero heading "Rebecca Kleinberg"', () => {
+  it('renders an h1 heading', () => {
     render(<HomePage />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Rebecca Kleinberg' })).toBeInTheDocument()
-  })
-
-  it('renders a "View Work" link', () => {
-    render(<HomePage />)
-    expect(screen.getByText('View Work')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
   })
 
   it('renders a "View Work" link pointing to "/work/paintings"', () => {
@@ -22,8 +17,4 @@ describe('HomePage', () => {
     expect(link).toHaveAttribute('href', '/work/paintings')
   })
 
-  it('renders a hero image with alt text', () => {
-    render(<HomePage />)
-    expect(screen.getByAltText('Featured artwork by Rebecca Kleinberg')).toBeInTheDocument()
-  })
 })

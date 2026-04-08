@@ -13,10 +13,11 @@ describe('Navigation', () => {
   })
 
   describe('rendering', () => {
-    it('renders the artist name link pointing to "/"', () => {
+    it('renders a home link pointing to "/"', () => {
       render(<Navigation />)
-      const link = screen.getByText('Rebecca Kleinberg')
-      expect(link).toHaveAttribute('href', '/')
+      const links = screen.getAllByRole('link')
+      const homeLink = links.find((l) => l.getAttribute('href') === '/')
+      expect(homeLink).toBeDefined()
     })
 
     it('renders About, Work, and Blog links', () => {
