@@ -186,6 +186,21 @@ describe('Lightbox', () => {
       expect(onNavigate).not.toHaveBeenCalled()
     })
 
+    it('prevents default on a valid swipe to suppress synthetic click (touch-enabled desktops)', () => {
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={vi.fn()} />
+      )
+      const dialog = screen.getByRole('dialog')
+      const touchEndEvent = new TouchEvent('touchend', {
+        bubbles: true,
+        cancelable: true,
+        changedTouches: [{ clientX: 50, clientY: 0 } as Touch],
+      })
+      fireEvent.touchStart(dialog, { touches: [{ clientX: 200, clientY: 0 }] })
+      dialog.dispatchEvent(touchEndEvent)
+      expect(touchEndEvent.defaultPrevented).toBe(true)
+    })
+
     it('swipe left at last index does not navigate', () => {
       const onNavigate = vi.fn()
       render(

@@ -39,6 +39,7 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
     const deltaY = t.clientY - touchStartRef.current.y
     touchStartRef.current = null
     if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return
+    e.preventDefault()
     if (deltaX < 0) goNext()
     else goPrev()
   }, [goNext, goPrev])
