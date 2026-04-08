@@ -18,9 +18,6 @@ export default async function PaintingsPage() {
           <h1 className="font-serif text-2xl md:text-3xl text-foreground">
             Paintings
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground max-w-lg">
-            Oil, acrylic, and mixed media works exploring color, form, and emotional depth.
-          </p>
         </div>
         <GalleryGrid artworks={paintings} />
       </main>

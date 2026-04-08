@@ -18,9 +18,6 @@ export default async function BlogPage() {
           <h1 className="font-serif text-2xl md:text-3xl text-foreground">
             Blog
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Notes, reflections, and updates from the studio.
-          </p>
         </div>
 
         <div className="flex flex-col">
