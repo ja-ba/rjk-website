@@ -13,10 +13,10 @@ describe('Navigation', () => {
   })
 
   describe('rendering', () => {
-    it('renders a home link pointing to "/"', () => {
+    it('renders a home link pointing to "/about"', () => {
       render(<Navigation />)
       const links = screen.getAllByRole('link')
-      const homeLink = links.find((l) => l.getAttribute('href') === '/')
+      const homeLink = links.find((l) => l.getAttribute('href') === '/about')
       expect(homeLink).toBeDefined()
     })
 
