@@ -144,6 +144,67 @@ describe('Lightbox', () => {
     })
   })
 
+  describe('touch/swipe navigation', () => {
+    function swipe(element: HTMLElement, startX: number, endX: number, startY = 0, endY = 0) {
+      fireEvent.touchStart(element, { touches: [{ clientX: startX, clientY: startY }] })
+      fireEvent.touchEnd(element, { changedTouches: [{ clientX: endX, clientY: endY }] })
+    }
+
+    it('swipe left calls onNavigate with next index', () => {
+      const onNavigate = vi.fn()
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={onNavigate} />
+      )
+      swipe(screen.getByRole('dialog'), 200, 50)
+      expect(onNavigate).toHaveBeenCalledWith(2)
+    })
+
+    it('swipe right calls onNavigate with previous index', () => {
+      const onNavigate = vi.fn()
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={onNavigate} />
+      )
+      swipe(screen.getByRole('dialog'), 50, 200)
+      expect(onNavigate).toHaveBeenCalledWith(0)
+    })
+
+    it('small horizontal swipe (<50px) does not navigate', () => {
+      const onNavigate = vi.fn()
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={onNavigate} />
+      )
+      swipe(screen.getByRole('dialog'), 200, 160)
+      expect(onNavigate).not.toHaveBeenCalled()
+    })
+
+    it('predominantly vertical movement does not navigate', () => {
+      const onNavigate = vi.fn()
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={onNavigate} />
+      )
+      swipe(screen.getByRole('dialog'), 200, 50, 0, 200)
+      expect(onNavigate).not.toHaveBeenCalled()
+    })
+
+    it('swipe left at last index does not navigate', () => {
+      const onNavigate = vi.fn()
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={2} onClose={vi.fn()} onNavigate={onNavigate} />
+      )
+      swipe(screen.getByRole('dialog'), 200, 50)
+      expect(onNavigate).not.toHaveBeenCalled()
+    })
+
+    it('swipe right at first index does not navigate', () => {
+      const onNavigate = vi.fn()
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={0} onClose={vi.fn()} onNavigate={onNavigate} />
+      )
+      swipe(screen.getByRole('dialog'), 50, 200)
+      expect(onNavigate).not.toHaveBeenCalled()
+    })
+  })
+
   describe('body scroll prevention', () => {
     it('sets document.body.style.overflow to "hidden" on mount', () => {
       render(
