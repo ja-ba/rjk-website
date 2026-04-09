@@ -100,15 +100,10 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
           <span className="sr-only">Next</span>
         </button>
 
-        {/* The image */}
+        {/* Fixed slot so layout does not jump when src updates before the next image paints */}
         <div
-          className="relative"
-          style={{
-            aspectRatio: `${artwork.width} / ${artwork.height}`,
-            maxWidth: "min(80vw, 75vh * " + (artwork.width / artwork.height) + ")",
-            maxHeight: "75vh",
-            width: "100%",
-          }}
+          data-testid="lightbox-image-slot"
+          className="relative mx-auto h-[75vh] w-full max-w-[80vw] shrink-0"
         >
           <Image
             src={artwork.src}
