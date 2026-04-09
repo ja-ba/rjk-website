@@ -17,7 +17,7 @@ export function Navigation() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-sm">
       <nav className="flex items-center justify-between px-6 py-5 md:px-12 lg:px-16">
         <Link
-          href="/"
+          href="/about"
           className="font-serif text-lg tracking-wide text-foreground transition-opacity hover:opacity-70"
         >
           Rebecca Kleinberg
