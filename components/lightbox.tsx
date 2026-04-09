@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect, useCallback, useRef } from "react"
+import { useEffect, useCallback, useRef, useState } from "react"
 import { X } from "lucide-react"
 import type { Artwork } from "@/lib/artwork-data"
 
@@ -16,6 +16,12 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
   const artwork = artworks[currentIndex]
   const hasNext = currentIndex < artworks.length - 1
   const hasPrev = currentIndex > 0
+
+  const [loaded, setLoaded] = useState(true)
+
+  useEffect(() => {
+    setLoaded(false)
+  }, [currentIndex])
 
   const goNext = useCallback(() => {
     if (hasNext) onNavigate(currentIndex + 1)
@@ -103,20 +109,24 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
         {/* The image */}
         <div
           className="relative"
+          data-testid="lightbox-image-container"
           style={{
             aspectRatio: `${artwork.width} / ${artwork.height}`,
             maxWidth: "min(80vw, 75vh * " + (artwork.width / artwork.height) + ")",
             maxHeight: "75vh",
             width: "100%",
+            transition: "all 300ms ease",
           }}
         >
           <Image
+            key={currentIndex}
             src={artwork.src}
             alt={artwork.title}
             fill
             sizes="80vw"
-            className="object-contain"
+            className={`object-contain transition-opacity duration-200 ${loaded ? "opacity-100" : "opacity-0"}`}
             priority
+            onLoad={() => setLoaded(true)}
           />
         </div>
 

@@ -220,6 +220,29 @@ describe('Lightbox', () => {
     })
   })
 
+  describe('image transition', () => {
+    it('container has CSS transition for smooth resizing', () => {
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={0} onClose={vi.fn()} onNavigate={vi.fn()} />
+      )
+      const container = screen.getByTestId('lightbox-image-container')
+      expect(container).toHaveStyle({ transition: 'all 300ms ease' })
+    })
+
+    it('image starts hidden after navigation and shows after load', () => {
+      const { rerender } = render(
+        <Lightbox artworks={mockArtworks} currentIndex={0} onClose={vi.fn()} onNavigate={vi.fn()} />
+      )
+      rerender(
+        <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={vi.fn()} />
+      )
+      const img = screen.getByAltText('Second')
+      expect(img).toHaveClass('opacity-0')
+      fireEvent.load(img)
+      expect(img).toHaveClass('opacity-100')
+    })
+  })
+
   describe('body scroll prevention', () => {
     it('sets document.body.style.overflow to "hidden" on mount', () => {
       render(
