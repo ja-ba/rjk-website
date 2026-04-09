@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect, useCallback } from "react"
+import { useEffect, useCallback, useRef } from "react"
 import { X } from "lucide-react"
 import type { Artwork } from "@/lib/artwork-data"
 
@@ -25,6 +25,25 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
     if (hasPrev) onNavigate(currentIndex - 1)
   }, [hasPrev, currentIndex, onNavigate])
 
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0]
+    touchStartRef.current = { x: t.clientX, y: t.clientY }
+  }, [])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return
+    const t = e.changedTouches[0]
+    const deltaX = t.clientX - touchStartRef.current.x
+    const deltaY = t.clientY - touchStartRef.current.y
+    touchStartRef.current = null
+    if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return
+    e.preventDefault()
+    if (deltaX < 0) goNext()
+    else goPrev()
+  }, [goNext, goPrev])
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
@@ -47,6 +66,8 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
       role="dialog"
       aria-modal="true"
       aria-label={`Viewing ${artwork.title}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Close button - z-30 to stay above click zones */}
       <button
