@@ -52,6 +52,28 @@ describe('Lightbox', () => {
       const img = screen.getByAltText('First')
       expect(img).toHaveAttribute('src', mockArtworks[0].src)
     })
+
+    it('keeps the image slot layout stable when switching between different aspect ratios', () => {
+      const wide = {
+        ...createMockArtwork({ title: 'Wide', width: 1600, height: 900 }),
+        id: 'wide',
+      }
+      const tall = {
+        ...createMockArtwork({ title: 'Tall', width: 900, height: 1600 }),
+        id: 'tall',
+      }
+      const props = {
+        artworks: [wide, tall],
+        onClose: vi.fn(),
+        onNavigate: vi.fn(),
+      }
+      const { rerender } = render(<Lightbox {...props} currentIndex={0} />)
+      const slot = screen.getByTestId('lightbox-image-slot')
+      const classesAtWide = slot.className
+      expect(slot).not.toHaveAttribute('style')
+      rerender(<Lightbox {...props} currentIndex={1} />)
+      expect(screen.getByTestId('lightbox-image-slot').className).toBe(classesAtWide)
+    })
   })
 
   describe('navigation callbacks', () => {

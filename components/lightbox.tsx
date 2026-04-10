@@ -80,35 +80,31 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
 
       {/* Image area with click navigation */}
       <div className="relative flex h-full w-full items-center justify-center px-4 py-16 md:px-16 md:py-20">
-        {/* Left click zone (previous) - always rendered to avoid layout seam */}
+        {/* Left/right halves: use inset edges (not two w-1/2) so odd widths cannot leave a 1px center gap */}
         <button
+          type="button"
           onClick={hasPrev ? goPrev : undefined}
-          className={`absolute left-0 top-0 z-10 h-full w-1/2 ${hasPrev ? "cursor-w-resize" : "cursor-default"}`}
+          className={`absolute inset-y-0 left-0 right-1/2 z-10 border-0 bg-transparent p-0 ${hasPrev ? "cursor-w-resize" : "cursor-default"}`}
           aria-label="Previous artwork"
           aria-disabled={!hasPrev}
         >
           <span className="sr-only">Previous</span>
         </button>
 
-        {/* Right click zone (next) - always rendered to avoid layout seam */}
         <button
+          type="button"
           onClick={hasNext ? goNext : undefined}
-          className={`absolute right-0 top-0 z-10 h-full w-1/2 ${hasNext ? "cursor-e-resize" : "cursor-default"}`}
+          className={`absolute inset-y-0 left-1/2 right-0 z-10 border-0 bg-transparent p-0 ${hasNext ? "cursor-e-resize" : "cursor-default"}`}
           aria-label="Next artwork"
           aria-disabled={!hasNext}
         >
           <span className="sr-only">Next</span>
         </button>
 
-        {/* The image */}
+        {/* Fixed slot so layout does not jump when src updates before the next image paints */}
         <div
-          className="relative"
-          style={{
-            aspectRatio: `${artwork.width} / ${artwork.height}`,
-            maxWidth: "min(80vw, 75vh * " + (artwork.width / artwork.height) + ")",
-            maxHeight: "75vh",
-            width: "100%",
-          }}
+          data-testid="lightbox-image-slot"
+          className="relative mx-auto h-[75vh] w-full max-w-[80vw] shrink-0"
         >
           <Image
             src={artwork.src}
