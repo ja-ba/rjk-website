@@ -74,6 +74,16 @@ describe('Lightbox', () => {
       rerender(<Lightbox {...props} currentIndex={1} />)
       expect(screen.getByTestId('lightbox-image-slot').className).toBe(classesAtWide)
     })
+
+    it('overlaps prev/next hit targets at the viewport center to avoid a vertical seam', () => {
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={vi.fn()} />
+      )
+      const prev = screen.getByLabelText('Previous artwork')
+      const next = screen.getByLabelText('Next artwork')
+      expect(prev.className).toContain('right-[calc(50%+1px)]')
+      expect(next.className).toContain('left-[calc(50%-1px)]')
+    })
   })
 
   describe('navigation callbacks', () => {

@@ -80,11 +80,11 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
 
       {/* Image area with click navigation */}
       <div className="relative flex h-full w-full items-center justify-center px-4 py-16 md:px-16 md:py-20">
-        {/* Left/right halves: use inset edges (not two w-1/2) so odd widths cannot leave a 1px center gap */}
+        {/* Left/right halves: overlap 1px at center so subpixel rounding cannot leave an unpainted seam */}
         <button
           type="button"
           onClick={hasPrev ? goPrev : undefined}
-          className={`absolute inset-y-0 left-0 right-1/2 z-10 border-0 bg-transparent p-0 ${hasPrev ? "cursor-w-resize" : "cursor-default"}`}
+          className={`absolute inset-y-0 left-0 right-[calc(50%+1px)] z-10 border-0 bg-transparent p-0 ${hasPrev ? "cursor-w-resize" : "cursor-default"}`}
           aria-label="Previous artwork"
           aria-disabled={!hasPrev}
         >
@@ -94,7 +94,7 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
         <button
           type="button"
           onClick={hasNext ? goNext : undefined}
-          className={`absolute inset-y-0 left-1/2 right-0 z-10 border-0 bg-transparent p-0 ${hasNext ? "cursor-e-resize" : "cursor-default"}`}
+          className={`absolute inset-y-0 left-[calc(50%-1px)] right-0 z-10 border-0 bg-transparent p-0 ${hasNext ? "cursor-e-resize" : "cursor-default"}`}
           aria-label="Next artwork"
           aria-disabled={!hasNext}
         >
