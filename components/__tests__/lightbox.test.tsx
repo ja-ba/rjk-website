@@ -38,6 +38,24 @@ describe('Lightbox', () => {
       expect(screen.getByText('Acrylic on panel')).toBeInTheDocument()
     })
 
+    it('displays the dimension when set', () => {
+      const artwork = { ...createMockArtwork({ title: 'Sized', dimension: '120 x 80 cm' }), id: 'sized' }
+      render(
+        <Lightbox artworks={[artwork]} currentIndex={0} onClose={vi.fn()} onNavigate={vi.fn()} />
+      )
+      expect(screen.getByText('120 x 80 cm')).toBeInTheDocument()
+    })
+
+    it('does not render a dimension line when dimension is empty', () => {
+      const artwork = { ...createMockArtwork({ title: 'NoDim', material: 'Charcoal', dimension: '' }), id: 'nodim' }
+      render(
+        <Lightbox artworks={[artwork]} currentIndex={0} onClose={vi.fn()} onNavigate={vi.fn()} />
+      )
+      const material = screen.getByText('Charcoal')
+      const overlay = material.parentElement!
+      expect(overlay.querySelectorAll('p')).toHaveLength(2)
+    })
+
     it('shows navigation counter', () => {
       render(
         <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={vi.fn()} />
