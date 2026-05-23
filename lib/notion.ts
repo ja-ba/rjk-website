@@ -241,6 +241,7 @@ export async function getArtworksByCategory(
         title,
         year: getNumber(page, "Year"),
         material: getRichText(page, "Material"),
+        dimension: getRichText(page, "Dimension"),
         src: filename ? `/images/${category}/${filename}.jpg` : "",
         width: getNumber(page, "Aspect Width"),
         height: getNumber(page, "Aspect Height"),

@@ -3,6 +3,7 @@ export interface Artwork {
   title: string
   year: number
   material: string
+  dimension: string
   src: string
   width: number
   height: number
