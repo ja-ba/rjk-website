@@ -120,9 +120,6 @@ export function GalleryGrid({ artworks }: GalleryGridProps) {
                       <p className="text-xs md:text-sm font-serif text-background">
                         {item.artwork.title}
                       </p>
-                      <p className="text-[10px] md:text-xs text-background/80">
-                        {item.artwork.year}
-                      </p>
                     </div>
                   </div>
                 </button>
