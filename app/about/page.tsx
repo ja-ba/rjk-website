@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { Instagram } from "lucide-react"
 import { Navigation } from "@/components/navigation"
 
 export const metadata = {
@@ -43,7 +44,7 @@ export default function AboutPage() {
                 
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-8 h-px bg-border" />
+                <Instagram className="w-4 h-4 flex-shrink-0" />
                 <a href="https://instagram.com/bek.art" className="hover:text-foreground transition-colors">
                   Instagram
                 </a>
