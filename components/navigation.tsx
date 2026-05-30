@@ -41,7 +41,7 @@ export function Navigation() {
             onMouseLeave={() => setWorkHover(false)}
           >
             <Link
-              href="/work/paintings"
+              href="/work/plein-air"
               className={cn(
                 "text-sm tracking-widest uppercase transition-opacity hover:opacity-60",
                 isWorkActive ? "text-foreground" : "text-muted-foreground"

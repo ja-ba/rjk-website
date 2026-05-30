@@ -26,7 +26,7 @@ describe('Navigation', () => {
       expect(aboutLinks[0]).toHaveAttribute('href', '/about')
       // "Work" appears as a link and as a mobile label — the first is the desktop link
       const workLinks = screen.getAllByText('Work')
-      expect(workLinks[0]).toHaveAttribute('href', '/work/paintings')
+      expect(workLinks[0]).toHaveAttribute('href', '/work/plein-air')
       const blogLinks = screen.getAllByText('Blog')
       expect(blogLinks[0]).toHaveAttribute('href', '/blog')
     })
