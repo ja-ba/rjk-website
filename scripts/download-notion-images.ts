@@ -48,7 +48,7 @@ async function main() {
   console.log(`Found ${pages.length} published artworks.`)
 
   // Ensure directories exist
-  for (const dir of ["paintings", "drawings"]) {
+  for (const dir of ["paintings", "drawings", "plein_air"]) {
     const dirPath = join(PUBLIC_DIR, dir)
     if (!existsSync(dirPath)) {
       await mkdir(dirPath, { recursive: true })

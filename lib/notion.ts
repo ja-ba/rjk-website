@@ -219,7 +219,7 @@ export async function getAllBlogSlugs(): Promise<string[]> {
 // --- Artwork Functions ---
 
 export async function getArtworksByCategory(
-  category: "paintings" | "drawings"
+  category: "paintings" | "drawings" | "plein_air"
 ): Promise<Artwork[]> {
   const pages = await queryAllPages({
     database_id: getArtworkDbId(),
@@ -250,17 +250,18 @@ export async function getArtworksByCategory(
 }
 
 export async function getAllArtworks(): Promise<Artwork[]> {
-  const [paintings, drawings] = await Promise.all([
+  const [paintings, drawings, pleinAir] = await Promise.all([
     getArtworksByCategory("paintings"),
     getArtworksByCategory("drawings"),
+    getArtworksByCategory("plein_air"),
   ])
-  return [...paintings, ...drawings]
+  return [...paintings, ...drawings, ...pleinAir]
 }
 
 // --- Artwork Image URLs (for build-time download) ---
 
 export interface ArtworkImageEntry {
-  category: "paintings" | "drawings"
+  category: "paintings" | "drawings" | "plein_air"
   sortOrder: number
   title: string
   imageUrl: string | null
@@ -280,7 +281,7 @@ export async function getArtworkImageUrls(): Promise<ArtworkImageEntry[]> {
   })
 
   return pages.map((page) => ({
-    category: getSelect(page, "Category") as "paintings" | "drawings",
+    category: getSelect(page, "Category") as "paintings" | "drawings" | "plein_air",
     sortOrder: getNumber(page, "Sort Order"),
     title: getTitle(page, "Title"),
     imageUrl: getFileUrl(page, "Image"),
