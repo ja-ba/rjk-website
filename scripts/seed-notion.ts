@@ -147,7 +147,7 @@ async function seedBlogPosts() {
 
 async function seedArtwork(
   items: typeof paintings,
-  category: "paintings" | "drawings"
+  category: "paintings" | "drawings" | "plein_air"
 ) {
   console.log(`Seeding ${category}...`)
 

@@ -6,7 +6,7 @@ export interface Artwork {
   src: string
   width: number
   height: number
-  category: "paintings" | "drawings"
+  category: "paintings" | "drawings" | "plein_air"
 }
 
 export interface BlogPost {

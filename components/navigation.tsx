@@ -59,6 +59,15 @@ export function Navigation() {
             >
               <div className="flex flex-col gap-1 border border-border bg-background px-5 py-3 shadow-sm">
                 <Link
+                  href="/work/plein-air"
+                  className={cn(
+                    "text-xs tracking-widest uppercase py-1.5 transition-opacity hover:opacity-60 whitespace-nowrap",
+                    pathname === "/work/plein-air" ? "text-foreground" : "text-muted-foreground"
+                  )}
+                >
+                  Plein Air
+                </Link>
+                <Link
                   href="/work/paintings"
                   className={cn(
                     "text-xs tracking-widest uppercase py-1.5 transition-opacity hover:opacity-60 whitespace-nowrap",
@@ -123,6 +132,16 @@ export function Navigation() {
             <span className="text-sm tracking-widest uppercase text-foreground">
               Work
             </span>
+            <Link
+              href="/work/plein-air"
+              onClick={() => setMobileOpen(false)}
+              className={cn(
+                "text-xs tracking-widest uppercase pl-4 transition-opacity hover:opacity-60",
+                pathname === "/work/plein-air" ? "text-foreground" : "text-muted-foreground"
+              )}
+            >
+              Plein Air
+            </Link>
             <Link
               href="/work/paintings"
               onClick={() => setMobileOpen(false)}

@@ -70,11 +70,13 @@ describe('Navigation', () => {
   })
 
   describe('dropdown links', () => {
-    it('contains Paintings and Drawings links', () => {
+    it('contains Plein Air, Paintings and Drawings links', () => {
       render(<Navigation />)
+      const pleinAirLinks = screen.getAllByText('Plein Air')
       const paintingsLinks = screen.getAllByText('Paintings')
       const drawingsLinks = screen.getAllByText('Drawings')
-      // Desktop dropdown Paintings link
+      // Desktop dropdown links
+      expect(pleinAirLinks[0]).toHaveAttribute('href', '/work/plein-air')
       expect(paintingsLinks[0]).toHaveAttribute('href', '/work/paintings')
       expect(drawingsLinks[0]).toHaveAttribute('href', '/work/drawings')
     })
@@ -88,15 +90,17 @@ describe('Navigation', () => {
       expect(screen.getByLabelText('Close menu')).toBeInTheDocument()
     })
 
-    it('mobile menu contains About, Paintings, Drawings, Blog links', () => {
+    it('mobile menu contains About, Plein Air, Paintings, Drawings, Blog links', () => {
       render(<Navigation />)
       // Mobile links exist in the DOM (they're hidden via CSS)
       const aboutLinks = screen.getAllByText('About')
+      const pleinAirLinks = screen.getAllByText('Plein Air')
       const paintingsLinks = screen.getAllByText('Paintings')
       const drawingsLinks = screen.getAllByText('Drawings')
       const blogLinks = screen.getAllByText('Blog')
       // Desktop + mobile = at least 2 of each
       expect(aboutLinks.length).toBeGreaterThanOrEqual(2)
+      expect(pleinAirLinks.length).toBeGreaterThanOrEqual(2)
       expect(paintingsLinks.length).toBeGreaterThanOrEqual(2)
       expect(drawingsLinks.length).toBeGreaterThanOrEqual(2)
       expect(blogLinks.length).toBeGreaterThanOrEqual(2)
