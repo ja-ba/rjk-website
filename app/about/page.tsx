@@ -33,18 +33,8 @@ export default function AboutPage() {
             </h2>
 
             <p className="text-sm leading-relaxed text-muted-foreground max-w-lg mb-6">
-              Rebecca Kleinberg is an artist based in Seattle, Washington. She is currently a first-year student in the Classical Atelier at Gage Academy of Art. Her recent work includes geometric designs, plein air landscapes, single-object still lifes in graphite, and academic figures and mastercopies.
+              Rebecca Kleinberg is an artist based in Seattle, Washington. She is currently a first-year student in the Classical Atelier at Gage Academy of Art. She is interested in still life, landscape, figure, and op-art.
             </p>
-
-            <h1 className="font-serif text-xl md:text-2xl text-foreground">
-              Artist statement
-            </h1>
-
-            <div className="mt-6 flex flex-col gap-5 text-sm leading-relaxed text-muted-foreground max-w-lg">
-              <p>
-                My goal is to make art that people want to look at because it makes them think or feel something. The art that has been most interesting and meaningful to me is art that evokes a feeling of recognition of our shared world - whether it’s the beauty or ugliness of that world - and recognition of some truth, however small or seemingly insignificant. I seek to find and portray small moments of truth in order to give the viewer this sense of recognition. I believe that any subject portrayed honestly and sympathetically, showing the inherent balance and harmony in our physical world, and striving for the essence of a thing, makes for successful artwork.
-              </p>
-            </div>
 
             {/* Contact / links */}
             <div className="mt-10 flex flex-col gap-2 text-xs tracking-widest uppercase text-muted-foreground">
