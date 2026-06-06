@@ -1,6 +1,7 @@
 import { writeFile, mkdir } from "fs/promises"
 import { existsSync } from "fs"
 import { join } from "path"
+import { isHeic, toJpeg } from "./image-utils"
 import {
   queryAllPages,
   getTitle,
@@ -16,21 +17,26 @@ async function downloadImage(
   filepath: string,
   retries = 3
 ): Promise<void> {
+  let buffer: Buffer | undefined
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const response = await fetch(url)
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
-      const buffer = Buffer.from(await response.arrayBuffer())
-      await writeFile(filepath, buffer)
-      return
+      buffer = Buffer.from(await response.arrayBuffer())
+      break
     } catch (error) {
       if (attempt === retries) throw error
       console.log(`  Retry ${attempt}/${retries}...`)
       await new Promise((r) => setTimeout(r, 1000 * attempt))
     }
   }
+  if (isHeic(buffer!)) {
+    console.log(`  Converting HEIC → JPEG: ${filepath}`)
+    buffer = await toJpeg(buffer!)
+  }
+  await writeFile(filepath, buffer!)
 }
 
 async function main() {
@@ -103,7 +109,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error("Fatal error:", error)
-  process.exit(1)
-})
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error("Fatal error:", error)
+    process.exit(1)
+  })
+}
