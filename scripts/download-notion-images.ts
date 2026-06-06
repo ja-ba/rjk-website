@@ -1,6 +1,7 @@
 import { writeFile, mkdir } from "fs/promises"
 import { existsSync } from "fs"
 import { join } from "path"
+import sharp from "sharp"
 import {
   queryAllPages,
   getTitle,
@@ -10,6 +11,14 @@ import {
 } from "../lib/notion"
 
 const PUBLIC_DIR = join(process.cwd(), "public", "images")
+
+// Detects HEIC/HEIF by the ISO Base Media 'ftyp' box at offset 4 and the brand at offset 8.
+export function isHeic(buf: Buffer): boolean {
+  if (buf.length < 12) return false
+  const ftyp = buf.toString("ascii", 4, 8)
+  const brand = buf.toString("ascii", 8, 12)
+  return ftyp === "ftyp" && ["heic", "heix", "mif1", "msf1"].includes(brand)
+}
 
 async function downloadImage(
   url: string,
@@ -22,7 +31,11 @@ async function downloadImage(
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
-      const buffer = Buffer.from(await response.arrayBuffer())
+      let buffer = Buffer.from(await response.arrayBuffer())
+      if (isHeic(buffer)) {
+        console.log(`  Converting HEIC → JPEG: ${filepath}`)
+        buffer = await sharp(buffer).jpeg({ quality: 90 }).toBuffer()
+      }
       await writeFile(filepath, buffer)
       return
     } catch (error) {
@@ -103,7 +116,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error("Fatal error:", error)
-  process.exit(1)
-})
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error("Fatal error:", error)
+    process.exit(1)
+  })
+}
