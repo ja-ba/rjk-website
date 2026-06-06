@@ -1,7 +1,7 @@
 import { writeFile, mkdir } from "fs/promises"
 import { existsSync } from "fs"
 import { join } from "path"
-import sharp from "sharp"
+import convert from "heic-convert"
 import {
   queryAllPages,
   getTitle,
@@ -34,7 +34,7 @@ async function downloadImage(
       let buffer = Buffer.from(await response.arrayBuffer())
       if (isHeic(buffer)) {
         console.log(`  Converting HEIC → JPEG: ${filepath}`)
-        buffer = await sharp(buffer).jpeg({ quality: 90 }).toBuffer()
+        buffer = Buffer.from(await convert({ buffer, format: "JPEG", quality: 0.9 }))
       }
       await writeFile(filepath, buffer)
       return
