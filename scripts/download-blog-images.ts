@@ -1,6 +1,7 @@
 import { writeFile, mkdir } from "fs/promises"
 import { existsSync } from "fs"
 import { join, extname } from "path"
+import { isHeic, toJpeg } from "./image-utils"
 import { queryAllPages, getRichText } from "../lib/notion"
 import { Client } from "@notionhq/client"
 
@@ -21,21 +22,26 @@ async function downloadImage(
   filepath: string,
   retries = 3
 ): Promise<void> {
+  let buffer: Buffer | undefined
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const response = await fetch(url)
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
-      const buffer = Buffer.from(await response.arrayBuffer())
-      await writeFile(filepath, buffer)
-      return
+      buffer = Buffer.from(await response.arrayBuffer())
+      break
     } catch (error) {
       if (attempt === retries) throw error
       console.log(`  Retry ${attempt}/${retries}...`)
       await new Promise((r) => setTimeout(r, 1000 * attempt))
     }
   }
+  if (isHeic(buffer!)) {
+    console.log(`  Converting HEIC → JPEG: ${filepath}`)
+    buffer = await toJpeg(buffer!)
+  }
+  await writeFile(filepath, buffer!)
 }
 
 async function getPageBlocks(pageId: string): Promise<any[]> {

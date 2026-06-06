@@ -1,7 +1,7 @@
 import { writeFile, mkdir } from "fs/promises"
 import { existsSync } from "fs"
 import { join } from "path"
-import convert from "heic-convert"
+import { isHeic, toJpeg } from "./image-utils"
 import {
   queryAllPages,
   getTitle,
@@ -12,38 +12,31 @@ import {
 
 const PUBLIC_DIR = join(process.cwd(), "public", "images")
 
-// Detects HEIC/HEIF by the ISO Base Media 'ftyp' box at offset 4 and the brand at offset 8.
-export function isHeic(buf: Buffer): boolean {
-  if (buf.length < 12) return false
-  const ftyp = buf.toString("ascii", 4, 8)
-  const brand = buf.toString("ascii", 8, 12)
-  return ftyp === "ftyp" && ["heic", "heix", "mif1", "msf1"].includes(brand)
-}
-
 async function downloadImage(
   url: string,
   filepath: string,
   retries = 3
 ): Promise<void> {
+  let buffer: Buffer | undefined
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const response = await fetch(url)
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
-      let buffer = Buffer.from(await response.arrayBuffer())
-      if (isHeic(buffer)) {
-        console.log(`  Converting HEIC → JPEG: ${filepath}`)
-        buffer = Buffer.from(await convert({ buffer, format: "JPEG", quality: 0.9 }))
-      }
-      await writeFile(filepath, buffer)
-      return
+      buffer = Buffer.from(await response.arrayBuffer())
+      break
     } catch (error) {
       if (attempt === retries) throw error
       console.log(`  Retry ${attempt}/${retries}...`)
       await new Promise((r) => setTimeout(r, 1000 * attempt))
     }
   }
+  if (isHeic(buffer!)) {
+    console.log(`  Converting HEIC → JPEG: ${filepath}`)
+    buffer = await toJpeg(buffer!)
+  }
+  await writeFile(filepath, buffer!)
 }
 
 async function main() {

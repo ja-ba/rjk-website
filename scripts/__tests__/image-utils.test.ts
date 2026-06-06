@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { isHeic } from "../download-notion-images"
+import { isHeic } from "../image-utils"
 
 function makeBuffer(hex: string): Buffer {
   return Buffer.from(hex.replace(/\s/g, ""), "hex")
