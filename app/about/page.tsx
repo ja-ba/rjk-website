@@ -41,7 +41,7 @@ export default function AboutPage() {
               Artist statement
             </h1>
 
-            <div className="mt-6 flex flex-col gap-5 text-sm leading-relaxed text-muted-foreground max-w-lg">
+            <div className="mt-3 flex flex-col gap-5 text-sm leading-relaxed text-muted-foreground max-w-lg">
               <p>
                 My work is inspired by the beauty and intrigue of our visual world and by my feeling of sympathy and connection with this world. In my work from life, I aim to show the specific character of objects, places, and people. In my abstract work, I think about expressing rhythm, balance, and harmony. For me, making art is about communicating emotional truths and sharing my vision with the viewer.
               </p>
