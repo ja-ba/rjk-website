@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { Instagram } from "lucide-react"
 import { Navigation } from "@/components/navigation"
 
 export const metadata = {
@@ -33,16 +34,16 @@ export default function AboutPage() {
             </h2>
 
             <p className="text-sm leading-relaxed text-muted-foreground max-w-lg mb-6">
-              Rebecca Kleinberg is an artist based in Seattle, Washington. She is currently a first-year student in the Classical Atelier at Gage Academy of Art. Her recent work includes geometric designs, plein air landscapes, single-object still lifes in graphite, and academic figures and mastercopies.
+              Rebecca Kleinberg is an artist based in Seattle, Washington. She is currently a first-year student in the Classical Atelier at Gage Academy of Art. She is interested in still life, landscape, figure, and abstract design.
             </p>
 
             <h1 className="font-serif text-xl md:text-2xl text-foreground">
               Artist statement
             </h1>
 
-            <div className="mt-6 flex flex-col gap-5 text-sm leading-relaxed text-muted-foreground max-w-lg">
+            <div className="mt-3 flex flex-col gap-5 text-sm leading-relaxed text-muted-foreground max-w-lg">
               <p>
-                My goal is to make art that people want to look at because it makes them think or feel something. The art that has been most interesting and meaningful to me is art that evokes a feeling of recognition of our shared world - whether it’s the beauty or ugliness of that world - and recognition of some truth, however small or seemingly insignificant. I seek to find and portray small moments of truth in order to give the viewer this sense of recognition. I believe that any subject portrayed honestly and sympathetically, showing the inherent balance and harmony in our physical world, and striving for the essence of a thing, makes for successful artwork.
+                My work is inspired by the beauty and intrigue of our visual world and by my feeling of sympathy and connection with this world. In my work from life, I aim to show the specific character of objects, places, and people. In my abstract work, I think about expressing rhythm, balance, and harmony. For me, making art is about communicating emotional truths and sharing my vision with the viewer.
               </p>
             </div>
 
@@ -53,7 +54,7 @@ export default function AboutPage() {
                 
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-8 h-px bg-border" />
+                <Instagram className="w-4 h-4 flex-shrink-0" />
                 <a href="https://instagram.com/bek.art" className="hover:text-foreground transition-colors">
                   Instagram
                 </a>
