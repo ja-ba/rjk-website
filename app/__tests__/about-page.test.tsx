@@ -11,6 +11,11 @@ describe('AboutPage', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'About' })).toBeInTheDocument()
   })
 
+  it('renders the artist statement', () => {
+    render(<AboutPage />)
+    expect(screen.getByRole('heading', { level: 1, name: 'Artist statement' })).toBeInTheDocument()
+  })
+
   it('renders the Instagram link', () => {
     render(<AboutPage />)
     expect(screen.getByText('Instagram')).toBeInTheDocument()
