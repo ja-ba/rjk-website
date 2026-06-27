@@ -127,6 +127,11 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
           <p className="text-xs md:text-sm text-background/60">
             {artwork.material}
           </p>
+          {artwork.dimension && (
+            <p className="text-xs md:text-sm text-background/60">
+              {artwork.dimension}
+            </p>
+          )}
         </div>
 
         {/* Navigation indicator bottom-right */}
