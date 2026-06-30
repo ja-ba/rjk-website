@@ -9,6 +9,7 @@ import {
   getSelect,
   getFileUrl,
 } from "../lib/notion"
+import { ARTWORK_CATEGORIES, isArtworkCategory } from "../lib/types"
 
 const PUBLIC_DIR = join(process.cwd(), "public", "images")
 
@@ -54,7 +55,7 @@ async function main() {
   console.log(`Found ${pages.length} published artworks.`)
 
   // Ensure directories exist
-  for (const dir of ["paintings", "drawings", "plein_air"]) {
+  for (const dir of ARTWORK_CATEGORIES) {
     const dirPath = join(PUBLIC_DIR, dir)
     if (!existsSync(dirPath)) {
       await mkdir(dirPath, { recursive: true })
@@ -71,6 +72,12 @@ async function main() {
     const category = getSelect(page, "Category")
     const filenameBase = getRichText(page, "filename")
     const imageUrl = getFileUrl(page, "Image")
+
+    if (!isArtworkCategory(category)) {
+      console.log(`  SKIP: "${title}" — unsupported category "${category}"`)
+      skipped++
+      continue
+    }
 
     if (!filenameBase) {
       console.log(`  SKIP: "${title}" — no filename set in Notion`)
