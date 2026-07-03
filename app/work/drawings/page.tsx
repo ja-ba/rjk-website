@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/navigation"
 import { GalleryGrid } from "@/components/gallery-grid"
+import { MissingDimensionsBanner } from "@/components/missing-dimensions-banner"
 import { getArtworksByCategory } from "@/lib/notion"
 
 export const metadata = {
@@ -9,6 +10,7 @@ export const metadata = {
 
 export default async function DrawingsPage() {
   const drawings = await getArtworksByCategory("drawings")
+  const valid = drawings.filter((a) => a.width > 0 && a.height > 0)
 
   return (
     <>
@@ -19,7 +21,8 @@ export default async function DrawingsPage() {
             Drawings
           </h1>
         </div>
-        <GalleryGrid artworks={drawings} />
+        <MissingDimensionsBanner artworks={drawings} />
+        <GalleryGrid artworks={valid} />
       </main>
     </>
   )

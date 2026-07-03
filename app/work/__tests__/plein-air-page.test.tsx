@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import PleinAirPage, { metadata } from '@/app/work/plein-air/page'
+import { getArtworksByCategory } from '@/lib/notion'
 
 vi.mock('@/lib/notion', () => ({
   getArtworksByCategory: vi.fn().mockResolvedValue([
@@ -28,5 +29,24 @@ describe('PleinAirPage', () => {
   it('exports correct metadata', () => {
     expect(metadata.title).toBeTruthy()
     expect(metadata.description).toBeTruthy()
+  })
+})
+
+describe('PleinAirPage with missing dimensions', () => {
+  it('filters out artworks with 0 dimensions and shows warning banner', async () => {
+    vi.mocked(getArtworksByCategory).mockResolvedValueOnce([
+      { id: 'pa1', title: 'Broken Plein Air', year: 2024, material: 'Oil', src: '/images/plein_air/pa1.jpg', width: 0, height: 0, category: 'plein_air' },
+      { id: 'pa2', title: 'Good Plein Air', year: 2023, material: 'Oil', src: '/images/plein_air/pa2.jpg', width: 4, height: 3, category: 'plein_air' },
+    ])
+
+    render(await PleinAirPage())
+
+    expect(screen.getByText(/Missing artwork dimensions/)).toBeInTheDocument()
+    expect(screen.getByText(/Broken Plein Air/)).toBeInTheDocument()
+
+    const buttons = screen.getAllByRole('button', { name: /^View / })
+    expect(buttons).toHaveLength(1)
+    expect(screen.getByLabelText('View Good Plein Air')).toBeInTheDocument()
+    expect(screen.queryByLabelText('View Broken Plein Air')).not.toBeInTheDocument()
   })
 })

@@ -8,6 +8,7 @@ import {
   getRichText,
   getSelect,
   getFileUrl,
+  getNumber,
 } from "../lib/notion"
 import { ARTWORK_CATEGORIES, isArtworkCategory } from "../lib/types"
 
@@ -40,6 +41,18 @@ async function downloadImage(
   await writeFile(filepath, buffer!)
 }
 
+export interface DimensionEntry {
+  title: string
+  filename: string
+  category: string
+  width: number
+  height: number
+}
+
+export function findMissingDimensions(entries: DimensionEntry[]): DimensionEntry[] {
+  return entries.filter((e) => e.width === 0 || e.height === 0)
+}
+
 async function main() {
   console.log("Fetching artwork entries from Notion...")
 
@@ -66,6 +79,7 @@ async function main() {
   let downloaded = 0
   let skipped = 0
   let failed = 0
+  const dimensionEntries: DimensionEntry[] = []
 
   for (const page of pages) {
     const title = getTitle(page, "Title")
@@ -78,6 +92,15 @@ async function main() {
       skipped++
       continue
     }
+
+    // Track dimensions for all valid-category entries (they appear in the gallery)
+    dimensionEntries.push({
+      title,
+      filename: filenameBase,
+      category,
+      width: getNumber(page, "Aspect Width"),
+      height: getNumber(page, "Aspect Height"),
+    })
 
     if (!filenameBase) {
       console.log(`  SKIP: "${title}" — no filename set in Notion`)
@@ -104,6 +127,30 @@ async function main() {
         `  FAILED: "${title}" — ${error instanceof Error ? error.message : error}`
       )
       failed++
+    }
+  }
+
+  // Validate dimensions after processing all pages
+  const missingDimensions = findMissingDimensions(dimensionEntries)
+  if (missingDimensions.length > 0) {
+    console.log(
+      `\n⚠️  MISSING DIMENSIONS (${missingDimensions.length} artwork(s) will not render in gallery):`
+    )
+    for (const entry of missingDimensions) {
+      console.log(
+        `  - "${entry.title}" (${entry.category}/${entry.filename || "?"}.jpg) — set Aspect Width & Aspect Height in Notion`
+      )
+    }
+
+    if (process.env.BUILD_ENV === "production") {
+      console.log(
+        "\n❌ Build failed: fix the above Notion entries before deploying to production."
+      )
+      failed += missingDimensions.length
+    } else {
+      console.log(
+        "\n(Preview/staging build continues — affected artworks will be hidden with a warning banner on the site.)"
+      )
     }
   }
 

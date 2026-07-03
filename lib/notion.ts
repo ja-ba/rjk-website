@@ -40,7 +40,7 @@ export function getRichText(page: PageObjectResponse, prop: string): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Notion v2 types use broad unions; runtime values are narrower
-function getNumber(page: PageObjectResponse, prop: string): number {
+export function getNumber(page: PageObjectResponse, prop: string): number {
   const p = page.properties[prop] as any
   if (p?.type === "number" && p.number !== null) {
     return p.number
