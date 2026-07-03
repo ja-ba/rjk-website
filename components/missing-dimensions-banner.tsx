@@ -1,5 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import type { Artwork } from "@/lib/artwork-data"
+import { hasDimensions } from "@/lib/types"
 
 interface MissingDimensionsBannerProps {
   artworks: Artwork[]
@@ -11,7 +12,7 @@ interface MissingDimensionsBannerProps {
  * build gate in download-notion-images.ts fails before deployment.
  */
 export function MissingDimensionsBanner({ artworks }: MissingDimensionsBannerProps) {
-  const missing = artworks.filter((a) => a.width === 0 || a.height === 0)
+  const missing = artworks.filter((a) => !hasDimensions(a))
   if (missing.length === 0) return null
   if (process.env.BUILD_ENV === "production") return null
 
@@ -26,14 +27,11 @@ export function MissingDimensionsBanner({ artworks }: MissingDimensionsBannerPro
         </p>
         <ul className="list-disc list-inside space-y-1">
           {missing.map((a) => {
-            // Derive a human-readable identifier: prefer the Notion title, fall
-            // back to the filename, then the Notion page id. Without this, rows
-            // with an empty Title render as a bare "— <category>" and can't be
-            // located in Notion.
+            // Prefer the Notion title; fall back to the filename derived from src
+            // so rows with an empty Title can still be located in Notion. The
+            // Notion page id is always surfaced alongside for the same reason.
             const filename = a.src.split("/").pop() ?? ""
-            const label =
-              a.title ||
-              (filename ? `Untitled (${filename})` : `Untitled (Notion id: ${a.id})`)
+            const label = a.title || (filename ? `Untitled (${filename})` : "Untitled")
             return (
               <li key={a.id}>
                 <strong>{label}</strong> — {a.category}

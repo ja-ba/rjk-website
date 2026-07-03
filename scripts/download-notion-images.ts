@@ -10,7 +10,7 @@ import {
   getFileUrl,
   getNumber,
 } from "../lib/notion"
-import { ARTWORK_CATEGORIES, isArtworkCategory } from "../lib/types"
+import { ARTWORK_CATEGORIES, isArtworkCategory, hasDimensions } from "../lib/types"
 
 const PUBLIC_DIR = join(process.cwd(), "public", "images")
 
@@ -41,18 +41,6 @@ async function downloadImage(
   await writeFile(filepath, buffer!)
 }
 
-export interface DimensionEntry {
-  title: string
-  filename: string
-  category: string
-  width: number
-  height: number
-}
-
-export function findMissingDimensions(entries: DimensionEntry[]): DimensionEntry[] {
-  return entries.filter((e) => e.width === 0 || e.height === 0)
-}
-
 async function main() {
   console.log("Fetching artwork entries from Notion...")
 
@@ -79,7 +67,8 @@ async function main() {
   let downloaded = 0
   let skipped = 0
   let failed = 0
-  const dimensionEntries: DimensionEntry[] = []
+  let dimensionGateFailed = false
+  const dimensionEntries: { title: string; filename: string; category: string; width: number; height: number }[] = []
 
   for (const page of pages) {
     const title = getTitle(page, "Title")
@@ -131,7 +120,7 @@ async function main() {
   }
 
   // Validate dimensions after processing all pages
-  const missingDimensions = findMissingDimensions(dimensionEntries)
+  const missingDimensions = dimensionEntries.filter((e) => !hasDimensions(e))
   if (missingDimensions.length > 0) {
     console.log(
       `\n⚠️  MISSING DIMENSIONS (${missingDimensions.length} artwork(s) will not render in gallery):`
@@ -146,7 +135,7 @@ async function main() {
       console.log(
         "\n❌ Build failed: fix the above Notion entries before deploying to production."
       )
-      failed += missingDimensions.length
+      dimensionGateFailed = true
     } else {
       console.log(
         "\n(Preview/staging build continues — affected artworks will be hidden with a warning banner on the site.)"
@@ -158,7 +147,7 @@ async function main() {
     `\nDone. Downloaded: ${downloaded}, Skipped: ${skipped}, Failed: ${failed}`
   )
 
-  if (failed > 0) {
+  if (failed > 0 || dimensionGateFailed) {
     process.exit(1)
   }
 }
