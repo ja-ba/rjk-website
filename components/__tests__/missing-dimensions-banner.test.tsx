@@ -59,6 +59,23 @@ describe("MissingDimensionsBanner", () => {
     expect(screen.queryByText(/Valid/)).not.toBeInTheDocument()
   })
 
+  it("falls back to filename and Notion id when title is empty", () => {
+    vi.stubEnv("BUILD_ENV", "preview")
+    const artworks = [
+      createMockArtwork({
+        title: "",
+        src: "/images/paintings/sunset.jpg",
+        width: 0,
+        height: 0,
+      }),
+    ]
+    render(<MissingDimensionsBanner artworks={artworks} />)
+    // Filename derived from src is shown so the row can be located in Notion
+    expect(screen.getByText(/sunset\.jpg/)).toBeInTheDocument()
+    // Notion page id is also surfaced as a stable identifier
+    expect(screen.getByText(/Notion id:/)).toBeInTheDocument()
+  })
+
   it("mentions Notion fields in the message", () => {
     vi.stubEnv("BUILD_ENV", "preview")
     const artworks = [createMockArtwork({ width: 0, height: 0 })]

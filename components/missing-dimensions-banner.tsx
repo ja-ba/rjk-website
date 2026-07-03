@@ -25,11 +25,27 @@ export function MissingDimensionsBanner({ artworks }: MissingDimensionsBannerPro
           gallery:
         </p>
         <ul className="list-disc list-inside space-y-1">
-          {missing.map((a) => (
-            <li key={a.id}>
-              <strong>{a.title}</strong> — {a.category}
-            </li>
-          ))}
+          {missing.map((a) => {
+            // Derive a human-readable identifier: prefer the Notion title, fall
+            // back to the filename, then the Notion page id. Without this, rows
+            // with an empty Title render as a bare "— <category>" and can't be
+            // located in Notion.
+            const filename = a.src.split("/").pop() ?? ""
+            const label =
+              a.title ||
+              (filename ? `Untitled (${filename})` : `Untitled (Notion id: ${a.id})`)
+            return (
+              <li key={a.id}>
+                <strong>{label}</strong> — {a.category}
+                {!a.title && (
+                  <span className="text-muted-foreground">
+                    {" "}
+                    (Notion id: <code>{a.id}</code>)
+                  </span>
+                )}
+              </li>
+            )
+          })}
         </ul>
         <p className="mt-2 text-muted-foreground">
           Set <code>Aspect Width</code> and <code>Aspect Height</code> number
