@@ -30,7 +30,7 @@ export function MissingDimensionsBanner({ artworks }: MissingDimensionsBannerPro
             // Prefer the Notion title; fall back to the filename derived from src
             // so rows with an empty Title can still be located in Notion. The
             // Notion page id is always surfaced alongside for the same reason.
-            const filename = a.src.split("/").pop() ?? ""
+            const filename = a.src.split("/").pop()
             const label = a.title || (filename ? `Untitled (${filename})` : "Untitled")
             return (
               <li key={a.id}>
