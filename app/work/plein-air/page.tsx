@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function PleinAirPage() {
   const pleinAir = await getArtworksByCategory("plein_air")
-  const valid = pleinAir.filter(hasDimensions)
+  const valid = pleinAir.filter(a => hasDimensions(a) && a.src)
 
   return (
     <>

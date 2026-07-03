@@ -41,7 +41,7 @@ describe('PleinAirPage with missing dimensions', () => {
 
     render(await PleinAirPage())
 
-    expect(screen.getByText(/Missing artwork dimensions/)).toBeInTheDocument()
+    expect(screen.getByText(/Incomplete artwork entries/)).toBeInTheDocument()
     expect(screen.getByText(/Broken Plein Air/)).toBeInTheDocument()
 
     const buttons = screen.getAllByRole('button', { name: /^View / })

@@ -41,7 +41,7 @@ describe('DrawingsPage with missing dimensions', () => {
 
     render(await DrawingsPage())
 
-    expect(screen.getByText(/Missing artwork dimensions/)).toBeInTheDocument()
+    expect(screen.getByText(/Incomplete artwork entries/)).toBeInTheDocument()
     expect(screen.getByText(/Broken Drawing/)).toBeInTheDocument()
 
     const buttons = screen.getAllByRole('button', { name: /^View / })

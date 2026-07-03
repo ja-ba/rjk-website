@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function PaintingsPage() {
   const paintings = await getArtworksByCategory("paintings")
-  const valid = paintings.filter(hasDimensions)
+  const valid = paintings.filter(a => hasDimensions(a) && a.src)
 
   return (
     <>

@@ -42,7 +42,7 @@ describe('PaintingsPage with missing dimensions', () => {
     render(await PaintingsPage())
 
     // Banner shows the broken artwork
-    expect(screen.getByText(/Missing artwork dimensions/)).toBeInTheDocument()
+    expect(screen.getByText(/Incomplete artwork entries/)).toBeInTheDocument()
     expect(screen.getByText(/Broken Art/)).toBeInTheDocument()
 
     // Only the valid artwork renders in the gallery
