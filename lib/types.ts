@@ -1,3 +1,10 @@
+export const ARTWORK_CATEGORIES = ["paintings", "drawings", "plein_air"] as const
+export type ArtworkCategory = (typeof ARTWORK_CATEGORIES)[number]
+
+export function isArtworkCategory(value: string): value is ArtworkCategory {
+  return (ARTWORK_CATEGORIES as readonly string[]).includes(value)
+}
+
 export interface Artwork {
   id: string
   title: string
@@ -7,7 +14,7 @@ export interface Artwork {
   src: string
   width: number
   height: number
-  category: "paintings" | "drawings" | "plein_air"
+  category: ArtworkCategory
 }
 
 export interface BlogPost {
