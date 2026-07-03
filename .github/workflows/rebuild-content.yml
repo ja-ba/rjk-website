@@ -25,6 +25,7 @@ jobs:
       - name: Download artwork images from Notion
         run: pnpm tsx scripts/download-notion-images.ts
         env:
+          BUILD_ENV: production
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_ARTWORK_DATABASE_ID: ${{ secrets.NOTION_ARTWORK_DATABASE_ID }}
       - name: Download blog post images from Notion
@@ -37,6 +38,7 @@ jobs:
       - name: Build project
         run: pnpm dlx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
+          BUILD_ENV: production
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_BLOG_DATABASE_ID: ${{ secrets.NOTION_BLOG_DATABASE_ID }}
           NOTION_ARTWORK_DATABASE_ID: ${{ secrets.NOTION_ARTWORK_DATABASE_ID }}
