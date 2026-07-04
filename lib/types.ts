@@ -17,6 +17,12 @@ export interface Artwork {
   category: ArtworkCategory
 }
 
+/** An artwork has usable dimensions when both width and height are set (> 0).
+ *  Notion stores missing Aspect Width/Height as 0, so a 0 means "missing". */
+export function hasDimensions(a: { width: number; height: number }): boolean {
+  return a.width > 0 && a.height > 0
+}
+
 export interface BlogPost {
   slug: string
   title: string

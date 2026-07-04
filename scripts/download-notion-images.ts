@@ -8,8 +8,14 @@ import {
   getRichText,
   getSelect,
   getFileUrl,
+  getNumber,
 } from "../lib/notion"
 import { ARTWORK_CATEGORIES, isArtworkCategory } from "../lib/types"
+import {
+  findMissingFilenames,
+  findMissingDimensions,
+  type ValidationEntry,
+} from "./artwork-validation"
 
 const PUBLIC_DIR = join(process.cwd(), "public", "images")
 
@@ -66,6 +72,9 @@ async function main() {
   let downloaded = 0
   let skipped = 0
   let failed = 0
+  let buildGateFailed = false
+  const allEntries: ValidationEntry[] = []
+  const missingFilenameEntries: ValidationEntry[] = []
 
   for (const page of pages) {
     const title = getTitle(page, "Title")
@@ -81,9 +90,25 @@ async function main() {
 
     if (!filenameBase) {
       console.log(`  SKIP: "${title}" — no filename set in Notion`)
+      missingFilenameEntries.push({
+        title,
+        filename: "",
+        category,
+        width: getNumber(page, "Aspect Width"),
+        height: getNumber(page, "Aspect Height"),
+      })
       skipped++
       continue
     }
+
+    // Track dimensions for entries that have a filename (they appear in the gallery)
+    allEntries.push({
+      title,
+      filename: filenameBase,
+      category,
+      width: getNumber(page, "Aspect Width"),
+      height: getNumber(page, "Aspect Height"),
+    })
 
     const filename = `${filenameBase}.jpg`
     const filepath = join(PUBLIC_DIR, category, filename)
@@ -107,11 +132,61 @@ async function main() {
     }
   }
 
+  // --- Validate artwork metadata ---
+
+  // Missing filenames — entries that won't render in the gallery at all
+  const missingFilenames = findMissingFilenames(missingFilenameEntries)
+  if (missingFilenames.length > 0) {
+    console.log(
+      `\n⚠️  MISSING FILENAME (${missingFilenames.length} artwork(s) need a filename set in Notion):`
+    )
+    for (const entry of missingFilenames) {
+      console.log(
+        `  - "${entry.title}" (${entry.category}) — set the "filename" property in Notion`
+      )
+    }
+
+    if (process.env.BUILD_ENV === "production") {
+      console.log(
+        "\n❌ Build failed: fix the above missing filenames before deploying to production."
+      )
+      buildGateFailed = true
+    } else {
+      console.log(
+        "\n(Preview/staging build continues — affected artworks will be skipped.)"
+      )
+    }
+  }
+
+  // Missing dimensions — entries that have a filename but invalid Aspect Width / Aspect Height
+  const missingDimensions = findMissingDimensions(allEntries)
+  if (missingDimensions.length > 0) {
+    console.log(
+      `\n⚠️  MISSING DIMENSIONS (${missingDimensions.length} artwork(s) will not render in gallery):`
+    )
+    for (const entry of missingDimensions) {
+      console.log(
+        `  - "${entry.title}" (${entry.category}/${entry.filename || "?"}.jpg) — set Aspect Width & Aspect Height in Notion`
+      )
+    }
+
+    if (process.env.BUILD_ENV === "production") {
+      console.log(
+        "\n❌ Build failed: fix the above Notion entries before deploying to production."
+      )
+      buildGateFailed = true
+    } else {
+      console.log(
+        "\n(Preview/staging build continues — affected artworks will be hidden with a warning banner on the site.)"
+      )
+    }
+  }
+
   console.log(
     `\nDone. Downloaded: ${downloaded}, Skipped: ${skipped}, Failed: ${failed}`
   )
 
-  if (failed > 0) {
+  if (failed > 0 || buildGateFailed) {
     process.exit(1)
   }
 }

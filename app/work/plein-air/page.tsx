@@ -1,6 +1,8 @@
 import { Navigation } from "@/components/navigation"
 import { GalleryGrid } from "@/components/gallery-grid"
+import { MissingDimensionsBanner } from "@/components/missing-dimensions-banner"
 import { getArtworksByCategory } from "@/lib/notion"
+import { hasDimensions } from "@/lib/types"
 
 export const metadata = {
   title: "Plein Air | Rebecca Kleinberg",
@@ -9,6 +11,7 @@ export const metadata = {
 
 export default async function PleinAirPage() {
   const pleinAir = await getArtworksByCategory("plein_air")
+  const valid = pleinAir.filter(a => hasDimensions(a) && a.src)
 
   return (
     <>
@@ -19,7 +22,8 @@ export default async function PleinAirPage() {
             Plein Air
           </h1>
         </div>
-        <GalleryGrid artworks={pleinAir} />
+        <MissingDimensionsBanner artworks={pleinAir} />
+        <GalleryGrid artworks={valid} />
       </main>
     </>
   )

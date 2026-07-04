@@ -1,6 +1,8 @@
 import { Navigation } from "@/components/navigation"
 import { GalleryGrid } from "@/components/gallery-grid"
+import { MissingDimensionsBanner } from "@/components/missing-dimensions-banner"
 import { getArtworksByCategory } from "@/lib/notion"
+import { hasDimensions } from "@/lib/types"
 
 export const metadata = {
   title: "Paintings | Rebecca Kleinberg",
@@ -9,6 +11,7 @@ export const metadata = {
 
 export default async function PaintingsPage() {
   const paintings = await getArtworksByCategory("paintings")
+  const valid = paintings.filter(a => hasDimensions(a) && a.src)
 
   return (
     <>
@@ -19,7 +22,8 @@ export default async function PaintingsPage() {
             Paintings
           </h1>
         </div>
-        <GalleryGrid artworks={paintings} />
+        <MissingDimensionsBanner artworks={paintings} />
+        <GalleryGrid artworks={valid} />
       </main>
     </>
   )
