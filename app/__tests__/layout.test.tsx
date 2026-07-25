@@ -1,14 +1,11 @@
 import { ReactNode } from 'react'
 
 import RootLayout from '@/app/layout'
+import { PublicAnalytics } from '@/components/public-analytics'
 
 vi.mock('next/font/google', () => ({
   Inter: () => ({ variable: '--font-inter' }),
   Playfair_Display: () => ({ variable: '--font-playfair' }),
-}))
-
-vi.mock('@vercel/analytics/next', () => ({
-  Analytics: () => null,
 }))
 
 function countElementsOfType(node: ReactNode, type: unknown): number {
@@ -25,10 +22,9 @@ function countElementsOfType(node: ReactNode, type: unknown): number {
 }
 
 describe('RootLayout', () => {
-  it('renders Vercel Analytics once for the application', async () => {
-    const { Analytics } = await import('@vercel/analytics/next')
+  it('renders public analytics once for the application', () => {
     const layout = RootLayout({ children: <main>Content</main> })
 
-    expect(countElementsOfType(layout, Analytics)).toBe(1)
+    expect(countElementsOfType(layout, PublicAnalytics)).toBe(1)
   })
 })

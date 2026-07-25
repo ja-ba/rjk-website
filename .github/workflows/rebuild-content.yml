@@ -39,6 +39,7 @@ jobs:
         run: pnpm dlx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           BUILD_ENV: production
+          NEXT_PUBLIC_ANALYTICS_ENABLED: 'true'
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_BLOG_DATABASE_ID: ${{ secrets.NOTION_BLOG_DATABASE_ID }}
           NOTION_ARTWORK_DATABASE_ID: ${{ secrets.NOTION_ARTWORK_DATABASE_ID }}
