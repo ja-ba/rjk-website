@@ -111,7 +111,7 @@ export function GalleryGrid({ artworks }: GalleryGridProps) {
                     src={item.artwork.src}
                     alt={item.artwork.title}
                     fill
-                    sizes="(max-width: 640px) 100vw, 50vw"
+                    sizes={`${Math.ceil(item.width)}px`}
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-foreground/0 transition-colors duration-300 group-hover:bg-foreground/10" />
