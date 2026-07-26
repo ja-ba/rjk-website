@@ -1,7 +1,20 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { Navigation } from '@/components/navigation'
 
 const mockPathname = vi.fn(() => '/')
+
+function mockMobileViewport(matches: boolean) {
+  vi.mocked(window.matchMedia).mockImplementation((query: string) => ({
+    matches: query === '(max-width: 767px)' && matches,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }))
+}
 
 vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname(),
@@ -10,6 +23,8 @@ vi.mock('next/navigation', () => ({
 describe('Navigation', () => {
   beforeEach(() => {
     mockPathname.mockReturnValue('/')
+    window.sessionStorage.clear()
+    mockMobileViewport(false)
   })
 
   describe('rendering', () => {
@@ -104,6 +119,96 @@ describe('Navigation', () => {
       expect(paintingsLinks.length).toBeGreaterThanOrEqual(2)
       expect(drawingsLinks.length).toBeGreaterThanOrEqual(2)
       expect(blogLinks.length).toBeGreaterThanOrEqual(2)
+    })
+  })
+
+  describe('session-based mobile introduction', () => {
+    it('automatically opens once on the About page in a mobile viewport', async () => {
+      mockPathname.mockReturnValue('/about')
+      mockMobileViewport(true)
+
+      render(<Navigation />)
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Close menu')).toBeInTheDocument()
+      })
+      expect(
+        window.sessionStorage.getItem('rjk-mobile-menu-intro-seen-v1')
+      ).toBe('true')
+    })
+
+    it('exposes the automatic open state to assistive technology', async () => {
+      mockPathname.mockReturnValue('/about')
+      mockMobileViewport(true)
+
+      render(<Navigation />)
+
+      const toggle = await screen.findByLabelText('Close menu')
+      expect(toggle).toHaveAttribute('aria-expanded', 'true')
+      expect(toggle).toHaveAttribute('aria-controls', 'mobile-navigation-menu')
+      expect(document.getElementById('mobile-navigation-menu')).toBeInTheDocument()
+    })
+
+    it('does not automatically reopen after it has been seen in the same session', () => {
+      mockPathname.mockReturnValue('/about')
+      mockMobileViewport(true)
+      window.sessionStorage.setItem('rjk-mobile-menu-intro-seen-v1', 'true')
+
+      render(<Navigation />)
+
+      expect(screen.getByLabelText('Open menu')).toBeInTheDocument()
+    })
+
+    it('opens again after the session marker is cleared', async () => {
+      mockPathname.mockReturnValue('/about')
+      mockMobileViewport(true)
+      window.sessionStorage.setItem('rjk-mobile-menu-intro-seen-v1', 'true')
+      window.sessionStorage.clear()
+
+      render(<Navigation />)
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Close menu')).toBeInTheDocument()
+      })
+    })
+
+    it('does not consume the introduction on desktop', () => {
+      mockPathname.mockReturnValue('/about')
+      mockMobileViewport(false)
+
+      render(<Navigation />)
+
+      expect(screen.getByLabelText('Open menu')).toBeInTheDocument()
+      expect(
+        window.sessionStorage.getItem('rjk-mobile-menu-intro-seen-v1')
+      ).toBeNull()
+    })
+
+    it('does not consume the introduction on another route', () => {
+      mockPathname.mockReturnValue('/work/plein-air')
+      mockMobileViewport(true)
+
+      render(<Navigation />)
+
+      expect(screen.getByLabelText('Open menu')).toBeInTheDocument()
+      expect(
+        window.sessionStorage.getItem('rjk-mobile-menu-intro-seen-v1')
+      ).toBeNull()
+    })
+
+    it('keeps the menu closed when session storage is unavailable', () => {
+      mockPathname.mockReturnValue('/about')
+      mockMobileViewport(true)
+      const getItem = vi
+        .spyOn(Storage.prototype, 'getItem')
+        .mockImplementation(() => {
+          throw new Error('storage unavailable')
+        })
+
+      render(<Navigation />)
+
+      expect(screen.getByLabelText('Open menu')).toBeInTheDocument()
+      getItem.mockRestore()
     })
   })
 })
