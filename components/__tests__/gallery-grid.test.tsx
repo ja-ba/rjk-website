@@ -115,6 +115,22 @@ describe('GalleryGrid component', () => {
     expect(screen.getByLabelText('View Test Painting')).toBeInTheDocument()
   })
 
+  it('advertises each computed tile width through the image sizes attribute', () => {
+    const artwork = createMockArtwork({
+      title: 'Responsive Thumbnail',
+      width: 4,
+      height: 3,
+    })
+
+    render(<GalleryGrid artworks={[artwork]} />)
+
+    // The test ResizeObserver supplies a 1200px container. A final-row 4:3
+    // image is capped at 260px high, producing a 346.67px-wide tile.
+    expect(
+      screen.getByRole('img', { name: 'Responsive Thumbnail' })
+    ).toHaveAttribute('sizes', '347px')
+  })
+
   it('clicking an artwork button opens the Lightbox', async () => {
     const user = userEvent.setup()
     const artworks = [createMockArtwork({ title: 'Clickable Art' })]
