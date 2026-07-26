@@ -2,14 +2,33 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+const MOBILE_MENU_SESSION_KEY = "rjk-mobile-menu-intro-seen-v1"
+const MOBILE_MEDIA_QUERY = "(max-width: 767px)"
 
 export function Navigation() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [workHover, setWorkHover] = useState(false)
+
+  useEffect(() => {
+    if (pathname !== "/about") return
+    if (!window.matchMedia(MOBILE_MEDIA_QUERY).matches) return
+
+    try {
+      if (window.sessionStorage.getItem(MOBILE_MENU_SESSION_KEY) !== null) {
+        return
+      }
+
+      window.sessionStorage.setItem(MOBILE_MENU_SESSION_KEY, "true")
+      setMobileOpen(true)
+    } catch {
+      // Avoid repeated automatic expansion when storage cannot remember it.
+    }
+  }, [pathname])
 
   const isWorkActive = pathname.startsWith("/work")
 
@@ -105,6 +124,8 @@ export function Navigation() {
           className="md:hidden text-foreground"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation-menu"
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -112,6 +133,7 @@ export function Navigation() {
 
       {/* Mobile Menu */}
       <div
+        id="mobile-navigation-menu"
         className={cn(
           "md:hidden overflow-hidden transition-all duration-300 bg-background border-b border-border",
           mobileOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0 border-b-0"
