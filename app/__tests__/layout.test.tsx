@@ -2,6 +2,7 @@ import { ReactNode } from 'react'
 
 import RootLayout from '@/app/layout'
 import { PublicAnalytics } from '@/components/public-analytics'
+import { SiteFooter } from '@/components/site-footer'
 
 vi.mock('next/font/google', () => ({
   Inter: () => ({ variable: '--font-inter' }),
@@ -26,5 +27,11 @@ describe('RootLayout', () => {
     const layout = RootLayout({ children: <main>Content</main> })
 
     expect(countElementsOfType(layout, PublicAnalytics)).toBe(1)
+  })
+
+  it('renders the site footer once for the application', () => {
+    const layout = RootLayout({ children: <main>Content</main> })
+
+    expect(countElementsOfType(layout, SiteFooter)).toBe(1)
   })
 })

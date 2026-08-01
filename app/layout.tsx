@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 
 import { PublicAnalytics } from '@/components/public-analytics'
+import { SiteFooter } from '@/components/site-footer'
 
 import './globals.css'
 
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         {children}
+        <SiteFooter />
         <PublicAnalytics />
       </body>
     </html>
