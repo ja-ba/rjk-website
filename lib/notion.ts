@@ -2,6 +2,12 @@ import { extname } from "path"
 import { Client } from "@notionhq/client"
 import type { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints"
 import type { Artwork, BlogPost, BlogPostFull, NotionBlock } from "./types"
+import {
+  listAllBlockComments,
+  resolveBlogImageSizes,
+  type ListCommentsParams,
+  type NotionComment,
+} from "./notion-image-sizing"
 
 export type PageObjectResponse = Extract<
   QueryDatabaseResponse["results"][number],
@@ -168,6 +174,17 @@ export function resolveImageBlocks(blocks: NotionBlock[], slug: string): NotionB
   })
 }
 
+async function getBlockComments(blockId: string): Promise<NotionComment[]> {
+  return listAllBlockComments(blockId, async (params: ListCommentsParams) => {
+    const response = await notion.comments.list(params)
+    return {
+      results: response.results as unknown as NotionComment[],
+      has_more: response.has_more,
+      next_cursor: response.next_cursor,
+    }
+  })
+}
+
 export async function getBlogPostBySlug(
   slug: string
 ): Promise<BlogPostFull | null> {
@@ -184,7 +201,10 @@ export async function getBlogPostBySlug(
   const page = response.results[0]
   if (!page || !("properties" in page)) return null
 
-  const blocks = resolveImageBlocks(await getPageBlocks(page.id), slug)
+  const blocks = await resolveBlogImageSizes(
+    resolveImageBlocks(await getPageBlocks(page.id), slug),
+    getBlockComments
+  )
 
   const dateRaw = getDate(page as PageObjectResponse, "Date")
   const date = dateRaw

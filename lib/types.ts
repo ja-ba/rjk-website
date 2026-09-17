@@ -38,6 +38,8 @@ export interface BlogPostFull {
   blocks: NotionBlock[]
 }
 
+export type BlogImageSize = "small" | "medium" | "large"
+
 export interface NotionBlock {
   id: string
   type: string
@@ -65,6 +67,7 @@ export interface NotionBlock {
     external?: { url: string }
     caption: NotionRichText[]
     localUrl?: string // injected at build time by resolveImageBlocks(), not from Notion
+    displaySize?: BlogImageSize // injected from an open Notion comment at build time
   }
 }
 

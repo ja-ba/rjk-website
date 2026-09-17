@@ -32,3 +32,15 @@ The normal flow is: **edit in Notion → publish to staging → check it looks r
 - Staging always pulls the latest version of your Notion content, so you never have to "save" or "sync" anything by hand. Just edit and click Staging.
 - If you see a red error message, the most likely cause is a mistyped password. Try again. If it keeps failing, ask your developer.
 - You don't have to use staging if you're confident in a small change — clicking **Promote** directly will also work — but staging is the safe habit.
+
+### Blog image sizes
+
+To control a blog image's display width, add an open Notion comment directly to the image containing exactly one of these words:
+
+- `Small` — up to 320 pixels
+- `Medium` — up to 480 pixels
+- `Large` — up to 560 pixels
+
+The image is centered at that maximum width and still shrinks to fit smaller screens. The newest valid size comment wins; all other comments are ignored. Leave the size comment unresolved so the build can read it. Resolve or delete all size comments to restore the default full-column width.
+
+The website's Notion integration must have its **Read comments** capability enabled for these settings to take effect.

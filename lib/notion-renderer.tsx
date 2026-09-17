@@ -1,4 +1,5 @@
 import type { NotionBlock, NotionRichText } from "./types"
+import { BLOG_IMAGE_MAX_WIDTHS } from "./notion-image-sizing"
 
 function renderRichText(richTexts: NotionRichText[]): React.ReactNode[] {
   return richTexts.map((text, i) => {
@@ -123,12 +124,32 @@ export function renderNotionBlocks(blocks: NotionBlock[]): React.ReactNode[] {
         if (!src) return null
         const captionText =
           block.image.caption?.map((t) => t.plain_text).join("") ?? ""
+        const maxWidth = block.image.displaySize
+          ? BLOG_IMAGE_MAX_WIDTHS[block.image.displaySize]
+          : undefined
         return (
-          <figure key={block.id}>
+          <figure
+            key={block.id}
+            data-image-size={block.image.displaySize}
+            style={
+              maxWidth
+                ? {
+                    width: "100%",
+                    maxWidth: `${maxWidth}px`,
+                    marginInline: "auto",
+                  }
+                : undefined
+            }
+          >
             <img
               src={src}
               alt={captionText || ""}
-              style={{ maxWidth: "100%", height: "auto", display: "block" }}
+              style={{
+                width: maxWidth ? "100%" : undefined,
+                maxWidth: "100%",
+                height: "auto",
+                display: "block",
+              }}
             />
             {captionText && (
               <figcaption className="mt-2 text-xs text-muted-foreground text-center">

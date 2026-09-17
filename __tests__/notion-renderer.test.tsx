@@ -100,6 +100,45 @@ describe("renderNotionBlocks", () => {
   })
 
   describe("image", () => {
+    it.each([
+      ["small", "320px"],
+      ["medium", "480px"],
+      ["large", "560px"],
+    ] as const)("renders a centered responsive %s image container", (displaySize, maxWidth) => {
+      const block = makeBlock("image", {
+        image: {
+          type: "external",
+          external: { url: "https://example.com/photo.png" },
+          caption: [],
+          displaySize,
+        },
+      })
+      const container = renderBlocks([block])
+      const figure = container.querySelector("figure")
+      const img = container.querySelector("img")
+
+      expect(figure).toHaveAttribute("data-image-size", displaySize)
+      expect(figure).toHaveStyle({ width: "100%", maxWidth, marginInline: "auto" })
+      expect(img).toHaveStyle({ width: "100%", maxWidth: "100%", height: "auto" })
+    })
+
+    it("keeps an image without a display size at the full-column default", () => {
+      const block = makeBlock("image", {
+        image: {
+          type: "external",
+          external: { url: "https://example.com/photo.png" },
+          caption: [],
+        },
+      })
+      const container = renderBlocks([block])
+      const figure = container.querySelector("figure")
+      const img = container.querySelector("img")
+
+      expect(figure).not.toHaveAttribute("data-image-size")
+      expect(figure).not.toHaveStyle("max-width: 320px")
+      expect(img).toHaveStyle({ maxWidth: "100%", height: "auto", display: "block" })
+    })
+
     it("renders a file-hosted image using localUrl", () => {
       const block = makeBlock("image", {
         image: {
