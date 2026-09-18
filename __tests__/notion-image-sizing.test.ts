@@ -39,6 +39,7 @@ describe("parseBlogImageSize", () => {
     ["Small", "small"],
     [" medium ", "medium"],
     ["LARGE", "large"],
+    [" x-SMALL ", "x-small"],
   ] as const)("recognizes %j as %j", (text, expected) => {
     expect(parseBlogImageSize([comment(text, "2026-01-01T00:00:00.000Z")])).toBe(expected)
   })

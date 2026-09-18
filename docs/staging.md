@@ -37,10 +37,11 @@ The normal flow is: **edit in Notion → publish to staging → check it looks r
 
 To control a blog image's display width, add an open Notion comment directly to the image containing exactly one of these words:
 
+- `X-Small` — up to 240 pixels
 - `Small` — up to 320 pixels
 - `Medium` — up to 480 pixels
 - `Large` — up to 560 pixels
 
-The image is centered at that maximum width and still shrinks to fit smaller screens. The newest valid size comment wins; all other comments are ignored. Leave the size comment unresolved so the build can read it. Resolve or delete all size comments to restore the default full-column width.
+The image is centered at that maximum width and still shrinks to fit smaller screens. Images without a valid size comment keep their natural width up to the full column and are centered as well. The newest valid size comment wins; all other comments are ignored. Leave the size comment unresolved so the build can read it. Resolve or delete all size comments to restore the default full-column width.
 
 The website's Notion integration must have its **Read comments** capability enabled for these settings to take effect.

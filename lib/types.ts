@@ -38,7 +38,7 @@ export interface BlogPostFull {
   blocks: NotionBlock[]
 }
 
-export type BlogImageSize = "small" | "medium" | "large"
+export type BlogImageSize = "x-small" | "small" | "medium" | "large"
 
 export interface NotionBlock {
   id: string

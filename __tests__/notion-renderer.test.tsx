@@ -101,6 +101,7 @@ describe("renderNotionBlocks", () => {
 
   describe("image", () => {
     it.each([
+      ["x-small", "240px"],
       ["small", "320px"],
       ["medium", "480px"],
       ["large", "560px"],
@@ -136,7 +137,12 @@ describe("renderNotionBlocks", () => {
 
       expect(figure).not.toHaveAttribute("data-image-size")
       expect(figure).not.toHaveStyle("max-width: 320px")
-      expect(img).toHaveStyle({ maxWidth: "100%", height: "auto", display: "block" })
+      expect(img).toHaveStyle({
+        maxWidth: "100%",
+        height: "auto",
+        display: "block",
+        marginInline: "auto",
+      })
     })
 
     it("renders a file-hosted image using localUrl", () => {

@@ -149,6 +149,7 @@ export function renderNotionBlocks(blocks: NotionBlock[]): React.ReactNode[] {
                 maxWidth: "100%",
                 height: "auto",
                 display: "block",
+                marginInline: "auto",
               }}
             />
             {captionText && (

@@ -25,9 +25,10 @@ export type BlogImageCommentsLoader = (
   blockId: string
 ) => Promise<NotionComment[]>
 
-const VALID_IMAGE_SIZES = new Set<BlogImageSize>(["small", "medium", "large"])
+const VALID_IMAGE_SIZES = new Set<BlogImageSize>(["x-small", "small", "medium", "large"])
 
 export const BLOG_IMAGE_MAX_WIDTHS: Record<BlogImageSize, number> = {
+  "x-small": 240,
   small: 320,
   medium: 480,
   large: 560,
