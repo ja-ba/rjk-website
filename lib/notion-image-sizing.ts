@@ -28,10 +28,10 @@ export type BlogImageCommentsLoader = (
 const VALID_IMAGE_SIZES = new Set<BlogImageSize>(["x-small", "small", "medium", "large"])
 
 export const BLOG_IMAGE_MAX_WIDTHS: Record<BlogImageSize, number> = {
-  "x-small": 240,
-  small: 320,
-  medium: 480,
-  large: 560,
+  "x-small": 200,
+  small: 310,
+  medium: 450,
+  large: 550,
 }
 
 /** Returns the newest valid display-size comment, if one exists. */

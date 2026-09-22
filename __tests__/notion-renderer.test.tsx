@@ -101,10 +101,10 @@ describe("renderNotionBlocks", () => {
 
   describe("image", () => {
     it.each([
-      ["x-small", "240px"],
-      ["small", "320px"],
-      ["medium", "480px"],
-      ["large", "560px"],
+      ["x-small", "200px"],
+      ["small", "310px"],
+      ["medium", "450px"],
+      ["large", "550px"],
     ] as const)("renders a centered responsive %s image container", (displaySize, maxWidth) => {
       const block = makeBlock("image", {
         image: {
