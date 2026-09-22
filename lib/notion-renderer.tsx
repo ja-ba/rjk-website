@@ -134,7 +134,6 @@ export function renderNotionBlocks(blocks: NotionBlock[]): React.ReactNode[] {
             style={
               maxWidth
                 ? {
-                    width: "100%",
                     maxWidth: `${maxWidth}px`,
                     marginInline: "auto",
                   }

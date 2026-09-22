@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@media (max-width: 639px) {
+  figure[data-image-size="x-small"] {
+    width: 60%;
+  }
+
+  figure[data-image-size="small"] {
+    width: 75%;
+  }
+
+  figure[data-image-size="medium"] {
+    width: 85%;
+  }
+
+  figure[data-image-size="large"] {
+    width: 95%;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

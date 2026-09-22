@@ -119,7 +119,8 @@ describe("renderNotionBlocks", () => {
       const img = container.querySelector("img")
 
       expect(figure).toHaveAttribute("data-image-size", displaySize)
-      expect(figure).toHaveStyle({ width: "100%", maxWidth, marginInline: "auto" })
+      expect(figure).toHaveStyle({ maxWidth, marginInline: "auto" })
+      expect(figure).not.toHaveStyle({ width: "100%" })
       expect(img).toHaveStyle({ width: "100%", maxWidth: "100%", height: "auto" })
     })
 
