@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+figure[data-image-size] {
+  width: 100%;
+}
+
 @media (max-width: 639px) {
   figure[data-image-size="x-small"] {
     width: 60%;
