@@ -4,6 +4,12 @@
 
 set -e
 
+echo "Enabling pnpm via Corepack..."
+corepack enable
+
+echo "Approving required package build scripts..."
+pnpm approve-builds esbuild sharp
+
 echo "Installing dependencies..."
 pnpm install
 
