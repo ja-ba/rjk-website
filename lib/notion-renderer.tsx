@@ -91,6 +91,18 @@ export function renderNotionBlocks(blocks: NotionBlock[]): React.ReactNode[] {
           </h4>
         )
 
+      case "heading_4":
+        return (
+          <h5
+            key={block.id}
+            className="font-serif text-sm md:text-base text-foreground"
+          >
+            {block.heading_4
+              ? renderRichText(block.heading_4.rich_text)
+              : null}
+          </h5>
+        )
+
       case "bulleted_list_item":
         return (
           <li

@@ -75,6 +75,16 @@ describe("renderNotionBlocks", () => {
       const container = renderBlocks([block])
       expect(container.querySelector("h4")).toHaveTextContent("Title Three")
     })
+
+    it("renders heading_4 as h5", () => {
+      const block = {
+        id: "block-4",
+        type: "heading_4",
+        heading_4: { rich_text: [makeRichText("Title Four")] },
+      } as unknown as NotionBlock
+      const container = renderBlocks([block])
+      expect(container.querySelector("h5")).toHaveTextContent("Title Four")
+    })
   })
 
   describe("list items", () => {

@@ -55,6 +55,9 @@ export interface NotionBlock {
   heading_3?: {
     rich_text: NotionRichText[]
   }
+  heading_4?: {
+    rich_text: NotionRichText[]
+  }
   bulleted_list_item?: {
     rich_text: NotionRichText[]
   }
