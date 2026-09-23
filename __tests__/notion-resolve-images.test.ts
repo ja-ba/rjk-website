@@ -101,4 +101,19 @@ describe("resolveImageBlocks", () => {
     const [result] = resolveImageBlocks([block], "another-slug")
     expect(result.image?.localUrl).toBe("/images/blog/another-slug/blk.jpg")
   })
+
+  it("rewrites file images nested inside child blocks", () => {
+    const childImage = makeFileImageBlock("nested-img", "https://s3.example.com/nested.png")
+    const parent = {
+      id: "parent",
+      type: "bulleted_list_item",
+      children: [childImage],
+    } as NotionBlock
+
+    const [result] = resolveImageBlocks([parent], "nested-post")
+
+    expect(result.children?.[0].image?.localUrl).toBe(
+      "/images/blog/nested-post/nested-img.png"
+    )
+  })
 })

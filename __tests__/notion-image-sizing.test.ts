@@ -130,4 +130,19 @@ describe("resolveBlogImageSizes", () => {
 
     expect(result.image?.displaySize).toBeUndefined()
   })
+
+  it("resolves image sizes nested inside child blocks", async () => {
+    const childImage = imageBlock("nested-image")
+    const parent = {
+      id: "parent",
+      type: "bulleted_list_item",
+      children: [childImage],
+    } as NotionBlock
+
+    const result = await resolveBlogImageSizes([parent], async () => [
+      comment("small", "2026-01-01T00:00:00.000Z"),
+    ])
+
+    expect(result[0].children?.[0].image?.displaySize).toBe("small")
+  })
 })
