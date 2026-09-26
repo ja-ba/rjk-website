@@ -154,15 +154,11 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 // Must use the same extension derivation logic as scripts/download-blog-images.ts.
 export function resolveImageBlocks(blocks: NotionBlock[], slug: string): NotionBlock[] {
   return blocks.map((block) => {
-    const blockWithChildren = block.children
-      ? { ...block, children: resolveImageBlocks(block.children, slug) }
-      : block
-
-    if (block.type !== "image" || !block.image) return blockWithChildren
-    if (block.image.type === "external") return blockWithChildren
+    if (block.type !== "image" || !block.image) return block
+    if (block.image.type === "external") return block
 
     const fileUrl = block.image.file?.url
-    if (!fileUrl) return blockWithChildren
+    if (!fileUrl) return block
 
     let ext: string
     try {
@@ -172,7 +168,7 @@ export function resolveImageBlocks(blocks: NotionBlock[], slug: string): NotionB
     }
 
     return {
-      ...blockWithChildren,
+      ...block,
       image: { ...block.image, localUrl: `/images/blog/${slug}/${block.id}${ext}` },
     }
   })
@@ -328,11 +324,7 @@ async function getPageBlocks(pageId: string): Promise<NotionBlock[]> {
 
     for (const block of response.results) {
       if ("type" in block) {
-        const notionBlock = block as unknown as NotionBlock
-        if (notionBlock.has_children) {
-          notionBlock.children = await getPageBlocks(notionBlock.id)
-        }
-        blocks.push(notionBlock)
+        blocks.push(block as unknown as NotionBlock)
       }
     }
 

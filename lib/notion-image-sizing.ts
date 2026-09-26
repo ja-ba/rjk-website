@@ -83,15 +83,8 @@ export async function resolveBlogImageSizes(
   const resolved: NotionBlock[] = []
 
   for (const block of blocks) {
-    const blockWithChildren = block.children
-      ? {
-          ...block,
-          children: await resolveBlogImageSizes(block.children, loadComments),
-        }
-      : block
-
     if (block.type !== "image" || !block.image) {
-      resolved.push(blockWithChildren)
+      resolved.push(block)
       continue
     }
 
@@ -100,7 +93,7 @@ export async function resolveBlogImageSizes(
       const image = { ...block.image }
       delete image.displaySize
       resolved.push({
-        ...blockWithChildren,
+        ...block,
         image: {
           ...image,
           ...(displaySize ? { displaySize } : {}),

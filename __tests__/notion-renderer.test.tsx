@@ -88,91 +88,24 @@ describe("renderNotionBlocks", () => {
   })
 
   describe("list items", () => {
-    it("renders bulleted_list_item inside an unordered list", () => {
+    it("renders bulleted_list_item as li with list-disc", () => {
       const block = makeBlock("bulleted_list_item", {
         bulleted_list_item: { rich_text: [makeRichText("Bullet point")] },
       })
       const container = renderBlocks([block])
       const li = container.querySelector("li")
-      const list = container.querySelector("ul")
       expect(li).toHaveTextContent("Bullet point")
-      expect(list).toBeInTheDocument()
-      expect(list).toHaveClass("list-disc")
+      expect(li).toHaveClass("list-disc")
     })
 
-    it("renders numbered_list_item inside an ordered list", () => {
+    it("renders numbered_list_item as li with list-decimal", () => {
       const block = makeBlock("numbered_list_item", {
         numbered_list_item: { rich_text: [makeRichText("Numbered point")] },
       })
       const container = renderBlocks([block])
       const li = container.querySelector("li")
-      const list = container.querySelector("ol")
       expect(li).toHaveTextContent("Numbered point")
-      expect(list).toBeInTheDocument()
-      expect(list).toHaveClass("list-decimal")
-    })
-
-    it("groups consecutive bulleted items in one unordered list", () => {
-      const blocks = [
-        makeBlock("bulleted_list_item", {
-          id: "first-item",
-          bulleted_list_item: { rich_text: [makeRichText("First point")] },
-        }),
-        makeBlock("bulleted_list_item", {
-          id: "second-item",
-          bulleted_list_item: { rich_text: [makeRichText("Second point")] },
-        }),
-      ]
-      const container = renderBlocks(blocks)
-      const list = container.querySelector("ul")
-
-      expect(list).toBeInTheDocument()
-      expect(list?.children).toHaveLength(2)
-      expect(list).toHaveTextContent("First point")
-      expect(list).toHaveTextContent("Second point")
-    })
-
-    it("renders nested list children inside their parent item", () => {
-      const block = {
-        id: "parent-item",
-        type: "bulleted_list_item",
-        bulleted_list_item: { rich_text: [makeRichText("Parent point")] },
-        children: [
-          {
-            id: "child-item",
-            type: "bulleted_list_item",
-            bulleted_list_item: { rich_text: [makeRichText("Indented point")] },
-          },
-        ],
-      } as unknown as NotionBlock
-      const container = renderBlocks([block])
-      const nestedList = container.querySelector("li ul")
-
-      expect(nestedList).toBeInTheDocument()
-      expect(nestedList).toHaveTextContent("Indented point")
-      expect(container.querySelectorAll("li")).toHaveLength(2)
-    })
-
-    it("renders a list indented beneath a non-list block", () => {
-      const block = {
-        id: "parent-paragraph",
-        type: "paragraph",
-        paragraph: { rich_text: [makeRichText("Intro text")] },
-        children: [
-          {
-            id: "indented-item",
-            type: "bulleted_list_item",
-            bulleted_list_item: { rich_text: [makeRichText("Indented point")] },
-          },
-        ],
-      } as unknown as NotionBlock
-      const container = renderBlocks([block])
-      const paragraph = container.querySelector("p")
-      const indentedList = paragraph?.parentElement?.querySelector("ul")
-
-      expect(paragraph).toHaveTextContent("Intro text")
-      expect(indentedList).toBeInTheDocument()
-      expect(indentedList).toHaveTextContent("Indented point")
+      expect(li).toHaveClass("list-decimal")
     })
   })
 

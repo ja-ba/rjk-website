@@ -53,23 +53,10 @@ async function getPageBlocks(pageId: string): Promise<any[]> {
       start_cursor: cursor,
       page_size: 100,
     })
-    for (const block of response.results) {
-      blocks.push(
-        "has_children" in block && block.has_children
-          ? { ...block, children: await getPageBlocks(block.id) }
-          : block
-      )
-    }
+    blocks.push(...response.results)
     cursor = response.has_more ? response.next_cursor ?? undefined : undefined
   } while (cursor)
   return blocks
-}
-
-function flattenBlocks(blocks: any[]): any[] {
-  return blocks.flatMap((block) => [
-    block,
-    ...(block.children ? flattenBlocks(block.children) : []),
-  ])
 }
 
 async function main() {
@@ -96,7 +83,7 @@ async function main() {
     }
 
     const blocks = await getPageBlocks(page.id)
-    const imageBlocks = flattenBlocks(blocks).filter(
+    const imageBlocks = blocks.filter(
       (b) => "type" in b && b.type === "image"
     )
 
