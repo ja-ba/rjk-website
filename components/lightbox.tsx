@@ -26,23 +26,96 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
   }, [hasPrev, currentIndex, onNavigate])
 
   const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+  const activeTouchesRef = useRef(0)
+  const gestureBlockedRef = useRef(false)
+  const suppressClickRef = useRef(false)
+  const suppressClickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const t = e.touches[0]
-    touchStartRef.current = { x: t.clientX, y: t.clientY }
+  const isViewportZoomed = useCallback(() => {
+    return typeof window !== "undefined" && (window.visualViewport?.scale ?? 1) > 1.01
   }, [])
 
+  const clearClickSuppression = useCallback(() => {
+    if (suppressClickTimeoutRef.current) {
+      clearTimeout(suppressClickTimeoutRef.current)
+      suppressClickTimeoutRef.current = null
+    }
+    suppressClickRef.current = false
+  }, [])
+
+  const suppressPostGestureClick = useCallback(() => {
+    suppressClickRef.current = true
+    if (suppressClickTimeoutRef.current) clearTimeout(suppressClickTimeoutRef.current)
+    suppressClickTimeoutRef.current = setTimeout(() => {
+      suppressClickRef.current = false
+      suppressClickTimeoutRef.current = null
+    }, 350)
+  }, [])
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (activeTouchesRef.current === 0) {
+      const t = e.touches[0]
+      touchStartRef.current = t ? { x: t.clientX, y: t.clientY } : null
+      gestureBlockedRef.current = false
+      if (e.touches.length === 1 && !isViewportZoomed()) clearClickSuppression()
+    }
+
+    activeTouchesRef.current = e.touches.length
+    if (e.touches.length > 1 || isViewportZoomed()) gestureBlockedRef.current = true
+  }, [clearClickSuppression, isViewportZoomed])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    activeTouchesRef.current = e.touches.length
+    if (e.touches.length > 1 || isViewportZoomed()) gestureBlockedRef.current = true
+  }, [isViewportZoomed])
+
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (!touchStartRef.current) return
-    const t = e.changedTouches[0]
-    const deltaX = t.clientX - touchStartRef.current.x
-    const deltaY = t.clientY - touchStartRef.current.y
+    if (e.touches.length > 0) {
+      activeTouchesRef.current = e.touches.length
+      if (e.touches.length > 1 || isViewportZoomed()) gestureBlockedRef.current = true
+      return
+    }
+
+    activeTouchesRef.current = 0
+    if (isViewportZoomed()) gestureBlockedRef.current = true
+
+    const start = touchStartRef.current
+    const gestureBlocked = gestureBlockedRef.current
     touchStartRef.current = null
+    gestureBlockedRef.current = false
+
+    if (gestureBlocked) {
+      suppressPostGestureClick()
+      return
+    }
+    if (!start) return
+
+    const t = e.changedTouches[0]
+    if (!t) return
+    const deltaX = t.clientX - start.x
+    const deltaY = t.clientY - start.y
     if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return
     e.preventDefault()
     if (deltaX < 0) goNext()
     else goPrev()
-  }, [goNext, goPrev])
+  }, [goNext, goPrev, isViewportZoomed, suppressPostGestureClick])
+
+  const handleTouchCancel = useCallback((e: React.TouchEvent) => {
+    activeTouchesRef.current = e.touches.length
+    if (e.touches.length > 0) return
+
+    touchStartRef.current = null
+    if (isViewportZoomed() || gestureBlockedRef.current) suppressPostGestureClick()
+    gestureBlockedRef.current = false
+  }, [isViewportZoomed, suppressPostGestureClick])
+
+  const handleNavigationClick = useCallback((e: React.MouseEvent, navigate: () => void) => {
+    if (isViewportZoomed() || gestureBlockedRef.current || suppressClickRef.current) {
+      e.preventDefault()
+      return
+    }
+    navigate()
+  }, [isViewportZoomed])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -60,6 +133,20 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
     }
   }, [onClose, goNext, goPrev])
 
+  useEffect(() => {
+    const visualViewport = window.visualViewport
+    const handleVisualViewportResize = () => {
+      if (activeTouchesRef.current > 0 && isViewportZoomed()) gestureBlockedRef.current = true
+    }
+
+    visualViewport?.addEventListener("resize", handleVisualViewportResize)
+
+    return () => {
+      visualViewport?.removeEventListener("resize", handleVisualViewportResize)
+      if (suppressClickTimeoutRef.current) clearTimeout(suppressClickTimeoutRef.current)
+    }
+  }, [isViewportZoomed])
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/95"
@@ -67,7 +154,9 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
       aria-modal="true"
       aria-label={`Viewing ${artwork.title}`}
       onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
     >
       {/* Close button - z-30 to stay above click zones */}
       <button
@@ -83,7 +172,7 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
         {/* Left/right halves: use inset edges (not two w-1/2) so odd widths cannot leave a 1px center gap */}
         <button
           type="button"
-          onClick={hasPrev ? goPrev : undefined}
+          onClick={hasPrev ? (e) => handleNavigationClick(e, goPrev) : undefined}
           className={`absolute inset-y-0 left-0 right-1/2 z-10 border-0 bg-transparent p-0 ${hasPrev ? "cursor-w-resize" : "cursor-default"}`}
           aria-label="Previous artwork"
           aria-disabled={!hasPrev}
@@ -93,7 +182,7 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
 
         <button
           type="button"
-          onClick={hasNext ? goNext : undefined}
+          onClick={hasNext ? (e) => handleNavigationClick(e, goNext) : undefined}
           className={`absolute inset-y-0 left-1/2 right-0 z-10 border-0 bg-transparent p-0 ${hasNext ? "cursor-e-resize" : "cursor-default"}`}
           aria-label="Next artwork"
           aria-disabled={!hasNext}
