@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest"
 const projectRoot = join(import.meta.dirname, "..")
 
 describe("Tailwind content discovery", () => {
-  it("emits the indentation utility used by the Notion renderer", () => {
+  it("emits the Notion renderer's indentation and mobile image-size utilities", () => {
     const directory = mkdtempSync(join(tmpdir(), "rjk-tailwind-"))
     const outputFile = join(directory, "output.css")
 
@@ -21,6 +21,10 @@ describe("Tailwind content discovery", () => {
       const css = readFileSync(outputFile, "utf8")
       expect(css).toMatch(/\.ml-4\s*\{[^}]*margin-left:\s*1rem/)
       expect(css).toMatch(/\.ml-6\s*\{[^}]*margin-left:\s*1.5rem/)
+      expect(css).toMatch(/figure\[data-image-size="x-small"\]\s*\{\s*width:\s*30%/)
+      expect(css).toMatch(/figure\[data-image-size="small"\]\s*\{\s*width:\s*50%/)
+      expect(css).toMatch(/figure\[data-image-size="medium"\]\s*\{\s*width:\s*70%/)
+      expect(css).toMatch(/figure\[data-image-size="large"\]\s*\{\s*width:\s*85%/)
     } finally {
       rmSync(directory, { recursive: true, force: true })
     }

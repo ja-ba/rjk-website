@@ -8,19 +8,19 @@ figure[data-image-size] {
 
 @media (max-width: 639px) {
   figure[data-image-size="x-small"] {
-    width: 40%;
+    width: 30%;
   }
 
   figure[data-image-size="small"] {
-    width: 60%;
+    width: 50%;
   }
 
   figure[data-image-size="medium"] {
-    width: 75%;
+    width: 70%;
   }
 
   figure[data-image-size="large"] {
-    width: 90%;
+    width: 85%;
   }
 }
 
