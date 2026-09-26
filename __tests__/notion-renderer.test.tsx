@@ -126,7 +126,11 @@ describe("renderNotionBlocks", () => {
 
       const container = renderBlocks([block])
 
+      const topLevelList = container.querySelector("ul")
+      const nestedList = container.querySelector("li > ul")
       expect(container.querySelector("li > ul > li")).toHaveTextContent("Indented point")
+      expect(topLevelList).toHaveClass("ml-6")
+      expect(nestedList).toHaveClass("ml-4")
     })
   })
 

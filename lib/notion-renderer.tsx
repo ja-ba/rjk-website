@@ -51,7 +51,7 @@ function renderListItem(block: NotionBlock): React.ReactNode {
       className="text-sm leading-relaxed text-muted-foreground"
     >
       {richText ? renderRichText(richText) : null}
-      {block.children?.length ? renderNotionBlocks(block.children) : null}
+      {block.children?.length ? renderNotionBlocks(block.children, true) : null}
     </li>
   )
 }
@@ -168,12 +168,15 @@ function renderBlockWithChildren(block: NotionBlock): React.ReactNode {
   return (
     <div key={block.id}>
       {content}
-      <div className="ml-4">{renderNotionBlocks(block.children)}</div>
+      <div className="ml-4">{renderNotionBlocks(block.children, true)}</div>
     </div>
   )
 }
 
-export function renderNotionBlocks(blocks: NotionBlock[]): React.ReactNode[] {
+export function renderNotionBlocks(
+  blocks: NotionBlock[],
+  isNested = false
+): React.ReactNode[] {
   const nodes: React.ReactNode[] = []
 
   for (let index = 0; index < blocks.length; ) {
@@ -195,8 +198,9 @@ export function renderNotionBlocks(blocks: NotionBlock[]): React.ReactNode[] {
 
     const List = isBulletedList ? "ul" : "ol"
     const listClassName = isBulletedList ? "list-disc" : "list-decimal"
+    const indentationClassName = isNested ? "ml-4" : "ml-6"
     nodes.push(
-      <List key={`list-${listBlocks[0].id}`} className={`ml-4 ${listClassName}`}>
+      <List key={`list-${listBlocks[0].id}`} className={`${indentationClassName} ${listClassName}`}>
         {listBlocks.map(renderListItem)}
       </List>
     )

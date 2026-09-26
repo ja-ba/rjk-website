@@ -20,6 +20,7 @@ describe("Tailwind content discovery", () => {
 
       const css = readFileSync(outputFile, "utf8")
       expect(css).toMatch(/\.ml-4\s*\{[^}]*margin-left:\s*1rem/)
+      expect(css).toMatch(/\.ml-6\s*\{[^}]*margin-left:\s*1.5rem/)
     } finally {
       rmSync(directory, { recursive: true, force: true })
     }
