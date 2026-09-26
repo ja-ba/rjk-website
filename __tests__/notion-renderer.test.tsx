@@ -75,6 +75,16 @@ describe("renderNotionBlocks", () => {
       const container = renderBlocks([block])
       expect(container.querySelector("h4")).toHaveTextContent("Title Three")
     })
+
+    it("renders heading_4 as h5", () => {
+      const block = {
+        id: "block-4",
+        type: "heading_4",
+        heading_4: { rich_text: [makeRichText("Title Four")] },
+      } as unknown as NotionBlock
+      const container = renderBlocks([block])
+      expect(container.querySelector("h5")).toHaveTextContent("Title Four")
+    })
   })
 
   describe("list items", () => {
@@ -84,8 +94,9 @@ describe("renderNotionBlocks", () => {
       })
       const container = renderBlocks([block])
       const li = container.querySelector("li")
+      const list = container.querySelector("ul")
       expect(li).toHaveTextContent("Bullet point")
-      expect(li).toHaveClass("list-disc")
+      expect(list).toHaveClass("list-disc")
     })
 
     it("renders numbered_list_item as li with list-decimal", () => {
@@ -94,12 +105,82 @@ describe("renderNotionBlocks", () => {
       })
       const container = renderBlocks([block])
       const li = container.querySelector("li")
+      const list = container.querySelector("ol")
       expect(li).toHaveTextContent("Numbered point")
-      expect(li).toHaveClass("list-decimal")
+      expect(list).toHaveClass("list-decimal")
+    })
+
+    it("renders a child list item inside a nested list", () => {
+      const block = {
+        id: "parent-item",
+        type: "bulleted_list_item",
+        bulleted_list_item: { rich_text: [makeRichText("Parent point")] },
+        children: [
+          {
+            id: "child-item",
+            type: "bulleted_list_item",
+            bulleted_list_item: { rich_text: [makeRichText("Indented point")] },
+          },
+        ],
+      } as unknown as NotionBlock
+
+      const container = renderBlocks([block])
+
+      const topLevelList = container.querySelector("ul")
+      const nestedList = container.querySelector("li > ul")
+      expect(container.querySelector("li > ul > li")).toHaveTextContent("Indented point")
+      expect(topLevelList).toHaveClass("ml-6")
+      expect(nestedList).toHaveClass("ml-4")
     })
   })
 
   describe("image", () => {
+    it.each([
+      ["x-small", "160px"],
+      ["small", "290px"],
+      ["medium", "430px"],
+      ["large", "530px"],
+    ] as const)("renders a centered responsive %s image container", (displaySize, maxWidth) => {
+      const block = makeBlock("image", {
+        image: {
+          type: "external",
+          external: { url: "https://example.com/photo.png" },
+          caption: [],
+          displaySize,
+        },
+      })
+      const container = renderBlocks([block])
+      const figure = container.querySelector("figure")
+      const img = container.querySelector("img")
+
+      expect(figure).toHaveAttribute("data-image-size", displaySize)
+      expect(figure).toHaveStyle({ maxWidth, marginInline: "auto" })
+      expect(figure).not.toHaveStyle({ width: "100%" })
+      expect(img).toHaveStyle({ width: "100%", maxWidth: "100%", height: "auto" })
+    })
+
+    it("keeps an image without a display size at the full-column default", () => {
+      const block = makeBlock("image", {
+        image: {
+          type: "external",
+          external: { url: "https://example.com/photo.png" },
+          caption: [],
+        },
+      })
+      const container = renderBlocks([block])
+      const figure = container.querySelector("figure")
+      const img = container.querySelector("img")
+
+      expect(figure).not.toHaveAttribute("data-image-size")
+      expect(figure).not.toHaveStyle("max-width: 320px")
+      expect(img).toHaveStyle({
+        maxWidth: "100%",
+        height: "auto",
+        display: "block",
+        marginInline: "auto",
+      })
+    })
+
     it("renders a file-hosted image using localUrl", () => {
       const block = makeBlock("image", {
         image: {

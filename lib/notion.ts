@@ -2,6 +2,12 @@ import { extname } from "path"
 import { Client } from "@notionhq/client"
 import type { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints"
 import type { Artwork, BlogPost, BlogPostFull, NotionBlock } from "./types"
+import {
+  listAllBlockComments,
+  resolveBlogImageSizes,
+  type ListCommentsParams,
+  type NotionComment,
+} from "./notion-image-sizing"
 
 export type PageObjectResponse = Extract<
   QueryDatabaseResponse["results"][number],
@@ -148,11 +154,15 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 // Must use the same extension derivation logic as scripts/download-blog-images.ts.
 export function resolveImageBlocks(blocks: NotionBlock[], slug: string): NotionBlock[] {
   return blocks.map((block) => {
-    if (block.type !== "image" || !block.image) return block
-    if (block.image.type === "external") return block
+    const blockWithChildren = block.children
+      ? { ...block, children: resolveImageBlocks(block.children, slug) }
+      : block
+
+    if (block.type !== "image" || !block.image) return blockWithChildren
+    if (block.image.type === "external") return blockWithChildren
 
     const fileUrl = block.image.file?.url
-    if (!fileUrl) return block
+    if (!fileUrl) return blockWithChildren
 
     let ext: string
     try {
@@ -162,8 +172,19 @@ export function resolveImageBlocks(blocks: NotionBlock[], slug: string): NotionB
     }
 
     return {
-      ...block,
+      ...blockWithChildren,
       image: { ...block.image, localUrl: `/images/blog/${slug}/${block.id}${ext}` },
+    }
+  })
+}
+
+async function getBlockComments(blockId: string): Promise<NotionComment[]> {
+  return listAllBlockComments(blockId, async (params: ListCommentsParams) => {
+    const response = await notion.comments.list(params)
+    return {
+      results: response.results as unknown as NotionComment[],
+      has_more: response.has_more,
+      next_cursor: response.next_cursor,
     }
   })
 }
@@ -184,7 +205,10 @@ export async function getBlogPostBySlug(
   const page = response.results[0]
   if (!page || !("properties" in page)) return null
 
-  const blocks = resolveImageBlocks(await getPageBlocks(page.id), slug)
+  const blocks = await resolveBlogImageSizes(
+    resolveImageBlocks(await getPageBlocks(page.id), slug),
+    getBlockComments
+  )
 
   const dateRaw = getDate(page as PageObjectResponse, "Date")
   const date = dateRaw
@@ -304,7 +328,11 @@ async function getPageBlocks(pageId: string): Promise<NotionBlock[]> {
 
     for (const block of response.results) {
       if ("type" in block) {
-        blocks.push(block as unknown as NotionBlock)
+        const notionBlock = block as unknown as NotionBlock
+        if (notionBlock.has_children) {
+          notionBlock.children = await getPageBlocks(notionBlock.id)
+        }
+        blocks.push(notionBlock)
       }
     }
 

@@ -38,9 +38,13 @@ export interface BlogPostFull {
   blocks: NotionBlock[]
 }
 
+export type BlogImageSize = "x-small" | "small" | "medium" | "large"
+
 export interface NotionBlock {
   id: string
   type: string
+  has_children?: boolean
+  children?: NotionBlock[]
   paragraph?: {
     rich_text: NotionRichText[]
   }
@@ -51,6 +55,9 @@ export interface NotionBlock {
     rich_text: NotionRichText[]
   }
   heading_3?: {
+    rich_text: NotionRichText[]
+  }
+  heading_4?: {
     rich_text: NotionRichText[]
   }
   bulleted_list_item?: {
@@ -65,6 +72,7 @@ export interface NotionBlock {
     external?: { url: string }
     caption: NotionRichText[]
     localUrl?: string // injected at build time by resolveImageBlocks(), not from Notion
+    displaySize?: BlogImageSize // injected from an open Notion comment at build time
   }
 }
 
