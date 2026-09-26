@@ -5,6 +5,8 @@ import { useEffect, useCallback, useRef } from "react"
 import { X } from "lucide-react"
 import type { Artwork } from "@/lib/artwork-data"
 
+const NAVIGATION_ZOOM_THRESHOLD = 1.2
+
 interface LightboxProps {
   artworks: Artwork[]
   currentIndex: number
@@ -31,8 +33,8 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
   const suppressClickRef = useRef(false)
   const suppressClickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const isViewportZoomed = useCallback(() => {
-    return typeof window !== "undefined" && (window.visualViewport?.scale ?? 1) > 1.01
+  const isNavigationZoomBlocked = useCallback(() => {
+    return typeof window !== "undefined" && (window.visualViewport?.scale ?? 1) > NAVIGATION_ZOOM_THRESHOLD
   }, [])
 
   const clearClickSuppression = useCallback(() => {
@@ -57,27 +59,27 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
       const t = e.touches[0]
       touchStartRef.current = t ? { x: t.clientX, y: t.clientY } : null
       gestureBlockedRef.current = false
-      if (e.touches.length === 1 && !isViewportZoomed()) clearClickSuppression()
+      if (e.touches.length === 1 && !isNavigationZoomBlocked()) clearClickSuppression()
     }
 
     activeTouchesRef.current = e.touches.length
-    if (e.touches.length > 1 || isViewportZoomed()) gestureBlockedRef.current = true
-  }, [clearClickSuppression, isViewportZoomed])
+    if (e.touches.length > 1 || isNavigationZoomBlocked()) gestureBlockedRef.current = true
+  }, [clearClickSuppression, isNavigationZoomBlocked])
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     activeTouchesRef.current = e.touches.length
-    if (e.touches.length > 1 || isViewportZoomed()) gestureBlockedRef.current = true
-  }, [isViewportZoomed])
+    if (e.touches.length > 1 || isNavigationZoomBlocked()) gestureBlockedRef.current = true
+  }, [isNavigationZoomBlocked])
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     if (e.touches.length > 0) {
       activeTouchesRef.current = e.touches.length
-      if (e.touches.length > 1 || isViewportZoomed()) gestureBlockedRef.current = true
+      if (e.touches.length > 1 || isNavigationZoomBlocked()) gestureBlockedRef.current = true
       return
     }
 
     activeTouchesRef.current = 0
-    if (isViewportZoomed()) gestureBlockedRef.current = true
+    if (isNavigationZoomBlocked()) gestureBlockedRef.current = true
 
     const start = touchStartRef.current
     const gestureBlocked = gestureBlockedRef.current
@@ -98,24 +100,24 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
     e.preventDefault()
     if (deltaX < 0) goNext()
     else goPrev()
-  }, [goNext, goPrev, isViewportZoomed, suppressPostGestureClick])
+  }, [goNext, goPrev, isNavigationZoomBlocked, suppressPostGestureClick])
 
   const handleTouchCancel = useCallback((e: React.TouchEvent) => {
     activeTouchesRef.current = e.touches.length
     if (e.touches.length > 0) return
 
     touchStartRef.current = null
-    if (isViewportZoomed() || gestureBlockedRef.current) suppressPostGestureClick()
+    if (isNavigationZoomBlocked() || gestureBlockedRef.current) suppressPostGestureClick()
     gestureBlockedRef.current = false
-  }, [isViewportZoomed, suppressPostGestureClick])
+  }, [isNavigationZoomBlocked, suppressPostGestureClick])
 
   const handleNavigationClick = useCallback((e: React.MouseEvent, navigate: () => void) => {
-    if (isViewportZoomed() || gestureBlockedRef.current || suppressClickRef.current) {
+    if (isNavigationZoomBlocked() || gestureBlockedRef.current || suppressClickRef.current) {
       e.preventDefault()
       return
     }
     navigate()
-  }, [isViewportZoomed])
+  }, [isNavigationZoomBlocked])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -136,7 +138,7 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
   useEffect(() => {
     const visualViewport = window.visualViewport
     const handleVisualViewportResize = () => {
-      if (activeTouchesRef.current > 0 && isViewportZoomed()) gestureBlockedRef.current = true
+      if (activeTouchesRef.current > 0 && isNavigationZoomBlocked()) gestureBlockedRef.current = true
     }
 
     visualViewport?.addEventListener("resize", handleVisualViewportResize)
@@ -145,7 +147,7 @@ export function Lightbox({ artworks, currentIndex, onClose, onNavigate }: Lightb
       visualViewport?.removeEventListener("resize", handleVisualViewportResize)
       if (suppressClickTimeoutRef.current) clearTimeout(suppressClickTimeoutRef.current)
     }
-  }, [isViewportZoomed])
+  }, [isNavigationZoomBlocked])
 
   return (
     <div

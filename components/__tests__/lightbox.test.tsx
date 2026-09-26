@@ -280,6 +280,43 @@ describe('Lightbox', () => {
       expect(onNavigate).not.toHaveBeenCalled()
     })
 
+    it('allows a fresh tap and swipe after a slight pinch zoom', () => {
+      const onNavigate = vi.fn()
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={onNavigate} />
+      )
+      const dialog = screen.getByRole('dialog')
+
+      fireEvent.touchStart(dialog, {
+        touches: [
+          { clientX: 200, clientY: 0 },
+          { clientX: 220, clientY: 0 },
+        ],
+      })
+      setVisualViewportScale(1.15)
+      fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 200, clientY: 0 }], touches: [] })
+      expect(onNavigate).not.toHaveBeenCalled()
+
+      fireEvent.touchStart(dialog, { touches: [{ clientX: 100, clientY: 0 }] })
+      fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 100, clientY: 0 }], touches: [] })
+      fireEvent.click(screen.getByLabelText('Next artwork'))
+      swipe(dialog, 50, 200)
+
+      expect(onNavigate.mock.calls).toEqual([[2], [0]])
+    })
+
+    it('allows image-area navigation at exactly 1.20x zoom', () => {
+      const onNavigate = vi.fn()
+      render(
+        <Lightbox artworks={mockArtworks} currentIndex={1} onClose={vi.fn()} onNavigate={onNavigate} />
+      )
+      setVisualViewportScale(1.2)
+
+      fireEvent.click(screen.getByLabelText('Next artwork'))
+
+      expect(onNavigate).toHaveBeenCalledWith(2)
+    })
+
     it('does not navigate on a swipe that starts while zoomed', () => {
       const onNavigate = vi.fn()
       render(
