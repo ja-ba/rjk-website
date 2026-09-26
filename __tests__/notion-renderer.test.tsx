@@ -94,8 +94,9 @@ describe("renderNotionBlocks", () => {
       })
       const container = renderBlocks([block])
       const li = container.querySelector("li")
+      const list = container.querySelector("ul")
       expect(li).toHaveTextContent("Bullet point")
-      expect(li).toHaveClass("list-disc")
+      expect(list).toHaveClass("list-disc")
     })
 
     it("renders numbered_list_item as li with list-decimal", () => {
@@ -104,8 +105,28 @@ describe("renderNotionBlocks", () => {
       })
       const container = renderBlocks([block])
       const li = container.querySelector("li")
+      const list = container.querySelector("ol")
       expect(li).toHaveTextContent("Numbered point")
-      expect(li).toHaveClass("list-decimal")
+      expect(list).toHaveClass("list-decimal")
+    })
+
+    it("renders a child list item inside a nested list", () => {
+      const block = {
+        id: "parent-item",
+        type: "bulleted_list_item",
+        bulleted_list_item: { rich_text: [makeRichText("Parent point")] },
+        children: [
+          {
+            id: "child-item",
+            type: "bulleted_list_item",
+            bulleted_list_item: { rich_text: [makeRichText("Indented point")] },
+          },
+        ],
+      } as unknown as NotionBlock
+
+      const container = renderBlocks([block])
+
+      expect(container.querySelector("li > ul > li")).toHaveTextContent("Indented point")
     })
   })
 

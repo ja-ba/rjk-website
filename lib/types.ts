@@ -43,6 +43,8 @@ export type BlogImageSize = "x-small" | "small" | "medium" | "large"
 export interface NotionBlock {
   id: string
   type: string
+  has_children?: boolean
+  children?: NotionBlock[]
   paragraph?: {
     rich_text: NotionRichText[]
   }
